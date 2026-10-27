@@ -1,0 +1,155 @@
+[
+  {
+    "id": "32f2e917-7e31-460d-b56a-09aa9e5e211e",
+    "title": "Literature Review: Cognitive Ergonomics in Digital Reading",
+    "content": "### Core Hypotheses\n\nReading velocity in non-glare digital environments increases by **14%** when using warm background temperatures (approx 4500K color temperature equivalent).\n\n> \"A quiet workspace allows cognitive synthesis to occur naturally, without premature crystallization of ideas.\"\n\n#### Key Observations:\n- Line length should strictly adhere to **50–75 characters per line** for sustained cognitive stamina.\n- Generous line height (`1.65–1.75`) reduces ocular jumping across dense paragraphs.\n- Tag hierarchies work best when descriptive rather than categorical.",
+    "tags": [
+      "research",
+      "cognition"
+    ],
+    "color": "sage",
+    "isPinned": true,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-12T09:00:00.000Z",
+    "updatedAt": "2026-10-25T07:00:00.000Z"
+  },
+  {
+    "id": "44c23139-cdc8-46cb-89e4-be8cf0616afa",
+    "title": "Autumn Garden & Herbal Teas Formulation",
+    "content": "Blending dried lemon verbena with wild sage and chamomile.\n\n**Proportions:** 3 parts verbena, 1 part sage.\n\nKeep steep time under 6 minutes for sweetness. Experiment with adding dried lavender buds for evening blends.",
+    "tags": [
+      "botany",
+      "journal"
+    ],
+    "color": "terracotta",
+    "isPinned": true,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-20T14:00:00.000Z",
+    "updatedAt": "2026-10-24T10:00:00.000Z"
+  },
+  {
+    "id": "832ec5a2-6795-41eb-b844-625176083cee",
+    "title": "Architectural Principles for Personal Knowledge Systems",
+    "content": "## Key Principles\n\n- Atomic notes over monolithic logs\n- Bidirectional linkage is valuable only when context is maintained\n- Prefer descriptive titles as standalone claims\n- Review and prune weekly to maintain signal quality\n\n> \"The value of a knowledge system is not in its size but in the connections between its parts.\"",
+    "tags": [
+      "systems",
+      "pkm"
+    ],
+    "color": "mustard",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-14T11:00:00.000Z",
+    "updatedAt": "2026-10-26T04:02:30.142Z",
+    "isTrash": false,
+    "deletedAt": null
+  },
+  {
+    "id": "b2b47bac-1707-4926-aecd-59f8aea88f70",
+    "title": "Quarterly Writing Goals & Manuscript Outlines",
+    "content": "Draft chapters 3 through 5 of the novella.\n\n**Daily routine:** Maintain 750 words daily morning routine before opening email or checking newsfeeds.\n\n### Milestones\n1. Chapter 3 first draft — Oct 20\n2. Chapter 4 outline — Oct 28\n3. Chapter 5 outline — Nov 5",
+    "tags": [
+      "writing",
+      "manuscript"
+    ],
+    "color": "sage",
+    "isPinned": true,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-11T08:30:00.000Z",
+    "updatedAt": "2026-10-11T08:30:00.000Z"
+  },
+  {
+    "id": "2c4d05db-60e8-4753-a151-3e1b5cacc2be",
+    "title": "Meeting Reflections: Design System Tokens & Accessibility",
+    "content": "Contrast ratios for muted terracotta against warm ivory need careful check.\n\nEnsure **4.5:1 ratio** on small body copy before pushing updates to production design library.\n\n### Action Items\n- Audit all text-on-surface color combinations\n- Test with screen reader software\n- Document accessible alternatives for color-only indicators",
+    "tags": [
+      "work",
+      "design-tokens"
+    ],
+    "color": "default",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-12T16:00:00.000Z",
+    "updatedAt": "2026-10-12T16:00:00.000Z"
+  },
+  {
+    "id": "84c53dba-b990-4bc5-98fa-d1f68e6ec7ae",
+    "title": "Bread Baking: 78% Hydration Sourdough Schedule",
+    "content": "### Process\n1. Autolyse 45m with warm water (28°C)\n2. 4 stretch-and-folds spaced 30m apart\n3. Bulk fermentation 4-5 hours at room temp\n4. Pre-shape and bench rest 20m\n5. Final shape and 14hr cold retardation in fridge\n\nThe long cold retard brings forward complex lactobacillus notes and a more open crumb structure.",
+    "tags": [
+      "baking",
+      "craft"
+    ],
+    "color": "default",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-10T07:00:00.000Z",
+    "updatedAt": "2026-10-26T04:02:12.412Z",
+    "isTrash": false,
+    "deletedAt": null
+  },
+  {
+    "id": "d6bc6717-2bbc-43c5-b5c9-fc70ebf6936e",
+    "title": "Quotes on Stillness & Quiet Workspaces",
+    "content": "> \"In a culture of noise and speed, the quiet craftsperson holds an unspoken sanctuary.\"\n\nNotes from Cal Newport and May Sarton on intentional isolation.\n\n> \"Solitude is the furnace wherein thoughts find their temper.\"\n\n> \"The best thinking has been done in solitude.\" — Thomas Edison",
+    "tags": [
+      "reading",
+      "quotes"
+    ],
+    "color": "default",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-08T19:00:00.000Z",
+    "updatedAt": "2026-10-25T16:11:32.649Z",
+    "isTrash": false,
+    "deletedAt": null
+  },
+  {
+    "id": "a1f05279-853c-4d37-97d3-f67963dc2269",
+    "title": "Graph Data Structures: BFS & DFS Revision",
+    "content": "## Breadth-First Search (BFS)\n- Uses a **queue** (FIFO)\n- Explores neighbors level by level\n- Time: O(V + E), Space: O(V)\n\n## Depth-First Search (DFS)\n- Uses a **stack** (LIFO) or recursion\n- Explores as deep as possible before backtracking\n- Time: O(V + E), Space: O(V)\n\n### Connected Components\nRun DFS/BFS from each unvisited vertex to find all components.",
+    "tags": [
+      "DSA",
+      "revision"
+    ],
+    "color": "sage",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-06T13:00:00.000Z",
+    "updatedAt": "2026-10-06T13:00:00.000Z"
+  },
+  {
+    "id": "a19d0495-0af9-447e-8b4f-41110bbbf93c",
+    "title": "Archived: Old Reading List 2025",
+    "content": "Books completed in 2025:\n- *Thinking, Fast and Slow* — Daniel Kahneman\n- *Atomic Habits* — James Clear\n- *Deep Work* — Cal Newport\n- *The Art of Learning* — Josh Waitzkin",
+    "tags": [
+      "reading",
+      "archive"
+    ],
+    "color": "default",
+    "isPinned": false,
+    "isArchived": true,
+    "isDeleted": false,
+    "createdAt": "2025-12-31T23:00:00.000Z",
+    "updatedAt": "2026-01-05T10:00:00.000Z"
+  },
+  {
+    "id": "6da137a5-4050-4af2-9fb7-8b8eeb0a78c6",
+    "title": "MERN",
+    "content": "",
+    "tags": [],
+    "color": "default",
+    "isPinned": true,
+    "isArchived": false,
+    "isDeleted": false,
+    "createdAt": "2026-10-25T09:36:02.529Z",
+    "updatedAt": "2026-10-26T05:44:19.538Z"
+  }
+]

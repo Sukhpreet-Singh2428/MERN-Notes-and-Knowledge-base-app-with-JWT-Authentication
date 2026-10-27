@@ -1,0 +1,159 @@
+/* ==========================================================================
+   Hearth Notes — Design Tokens
+   Extracted from Stitch AI design system reference.
+   ========================================================================== */
+
+:root {
+  /* ── Palette: Warm editorial organic tones ── */
+  --color-canvas:              #F7F5EF;
+  --color-surface:             #FFFEFA;
+  --color-surface-dim:         #F0EDE5;
+  --color-surface-container:   #E9F0E4;
+  --color-surface-container-low: #EFF6EA;
+  --color-surface-container-high: #E3EADF;
+  --color-surface-container-lowest: #FFFFFF;
+
+  --color-primary:             #476653;
+  --color-primary-dark:        #3B5545;
+  --color-primary-light:       #E0E9DE;
+  --color-primary-container:   #476653;
+  --color-primary-fixed:       #C8EBD3;
+  --color-primary-fixed-dim:   #ACCFB7;
+  --color-on-primary:          #FFFFFF;
+
+  --color-secondary:           #C9826A;
+  --color-secondary-dark:      #8B4E39;
+  --color-secondary-light:     #F3E0D6;
+  --color-secondary-container: #FDAE94;
+  --color-secondary-fixed:     #FFDBCF;
+  --color-on-secondary:        #FFFFFF;
+
+  --color-tertiary:            #DCC58A;
+  --color-tertiary-dark:       #6E5D2C;
+  --color-tertiary-container:  #BFA971;
+  --color-tertiary-fixed:      #F9E0A3;
+
+  --color-text-primary:        #30372F;
+  --color-text-secondary:      #777B70;
+  --color-text-on-surface:     #171D16;
+  --color-text-on-surface-variant: #424843;
+
+  --color-border:              #E5E0D5;
+  --color-border-strong:       #C2C8C1;
+  --color-outline:             #727973;
+
+  --color-error:               #BA1A1A;
+  --color-error-container:     #FFDAD6;
+
+  --color-inverse-surface:     #2B322A;
+  --color-inverse-on-surface:  #ECF3E7;
+
+  /* ── Note card accent colors ── */
+  --note-color-default:        #FFFEFA;
+  --note-color-sage:           #E0E9DE;
+  --note-color-terracotta:     #F6DED4;
+  --note-color-mustard:        #F9EEC9;
+  --note-color-slate:          #DBE2DE;
+
+  --note-accent-default:       #E5E0D5;
+  --note-accent-sage:          #476653;
+  --note-accent-terracotta:    #8B4E39;
+  --note-accent-mustard:       #BFA971;
+  --note-accent-slate:         #727973;
+
+  /* ── Typography ── */
+  --font-display:    'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-body:       'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ── Spacing (8pt grid) ── */
+  --space-xs:   0.25rem;   /* 4px  */
+  --space-sm:   0.5rem;    /* 8px  */
+  --space-md:   1rem;      /* 16px */
+  --space-lg:   1.5rem;    /* 24px */
+  --space-xl:   2rem;      /* 32px */
+  --gutter:     1.5rem;    /* 24px */
+  --margin:     2rem;      /* 32px */
+
+  /* ── Radii ── */
+  --radius-sm:  10px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+  --radius-pill: 9999px;
+
+  /* ── Shadows (warm-tinted) ── */
+  --shadow-sm:  0 1px 3px -1px rgba(48, 55, 47, 0.03);
+  --shadow-md:  0 2px 8px -2px rgba(48, 55, 47, 0.05), 0 1px 3px -1px rgba(48, 55, 47, 0.03);
+  --shadow-lg:  0 12px 32px -4px rgba(48, 55, 47, 0.08), 0 4px 12px -2px rgba(48, 55, 47, 0.04);
+  --shadow-btn: 0 1px 2px rgba(48, 55, 47, 0.12);
+
+  /* ── Layout ── */
+  --sidebar-width: 248px;
+  --header-height: 72px;
+  --content-max-width: 1400px;
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+/* ── Dark Theme ── */
+[data-theme="dark"] {
+  --color-canvas:              #1A1E1A;
+  --color-surface:             #242824;
+  --color-surface-dim:         #2B322A;
+  --color-surface-container:   #303730;
+  --color-surface-container-low: #272C27;
+  --color-surface-container-high: #3A413A;
+  --color-surface-container-lowest: #1E221E;
+
+  --color-primary:             #ACCFB7;
+  --color-primary-dark:        #8AB898;
+  --color-primary-light:       #2F4D3B;
+  --color-primary-container:   #2F4D3B;
+  --color-primary-fixed:       #1A3626;
+  --color-primary-fixed-dim:   #2F4D3B;
+  --color-on-primary:          #1A1E1A;
+
+  --color-secondary:           #FFB59C;
+  --color-secondary-dark:      #C9826A;
+  --color-secondary-light:     #4A2A1E;
+  --color-secondary-container: #6E3724;
+  --color-secondary-fixed:     #3A1E10;
+  --color-on-secondary:        #1A1E1A;
+
+  --color-tertiary:            #F9E0A3;
+  --color-tertiary-dark:       #DCC58A;
+  --color-tertiary-container:  #554516;
+  --color-tertiary-fixed:      #3A2F0A;
+
+  --color-text-primary:        #E8EDE5;
+  --color-text-secondary:      #A0A59A;
+  --color-text-on-surface:     #E8EDE5;
+  --color-text-on-surface-variant: #C2C8C1;
+
+  --color-border:              #3A413A;
+  --color-border-strong:       #4A514A;
+  --color-outline:             #8A918A;
+
+  --color-inverse-surface:     #E8EDE5;
+  --color-inverse-on-surface:  #2B322A;
+
+  --note-color-default:        #242824;
+  --note-color-sage:           #2A3A2E;
+  --note-color-terracotta:     #3A2820;
+  --note-color-mustard:        #3A3420;
+  --note-color-slate:          #2A3030;
+
+  --note-accent-default:       #4A514A;
+  --note-accent-sage:          #ACCFB7;
+  --note-accent-terracotta:    #FFB59C;
+  --note-accent-mustard:       #F9E0A3;
+  --note-accent-slate:         #8A918A;
+
+  --shadow-sm:  0 1px 3px -1px rgba(0, 0, 0, 0.15);
+  --shadow-md:  0 2px 8px -2px rgba(0, 0, 0, 0.2), 0 1px 3px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg:  0 12px 32px -4px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
