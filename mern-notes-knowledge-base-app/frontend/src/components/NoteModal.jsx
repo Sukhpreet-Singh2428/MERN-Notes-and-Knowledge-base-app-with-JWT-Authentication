@@ -95,7 +95,7 @@ export default function NoteModal() {
 
   return (
     <div
-      className="fixed inset-0 bg-[#2b322a]/40 backdrop-blur-[6px] z-50 flex items-center justify-center p-space-md sm:p-space-lg overflow-y-auto animate-in fade-in"
+      className="fixed inset-0 bg-[#171d16]/50 dark:bg-black/75 backdrop-blur-[6px] z-50 flex items-center justify-center p-2.5 sm:p-space-md overflow-y-auto animate-in fade-in"
       onClick={() => setModalNote(null)}
     >
       <section
@@ -103,17 +103,17 @@ export default function NoteModal() {
         aria-modal="true"
         role="dialog"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[780px] my-auto bg-surface-container-lowest rounded-[20px] shadow-[0_20px_48px_-8px_rgba(48,55,47,0.18)] border border-surface-container flex flex-col overflow-hidden relative max-h-[90vh]"
+        className="w-full max-w-[780px] my-auto bg-surface-container-lowest rounded-2xl sm:rounded-[20px] shadow-2xl border border-surface-container flex flex-col overflow-hidden relative max-h-[94vh] sm:max-h-[90vh]"
       >
         {/* Left Color Accent Strip */}
         <div
           className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-300"
-          style={{ backgroundColor: colorMeta.accent }}
+          style={{ backgroundColor: `var(--note-accent-${color || 'default'}, ${colorMeta.accent})` }}
         ></div>
 
         {/* Top Header Row */}
-        <header className="px-space-lg pt-space-md pb-space-sm flex items-center justify-between pl-7 border-b border-surface-container/60">
-          <div className="flex items-center gap-space-sm">
+        <header className="px-4 sm:px-space-lg pt-3 sm:pt-space-md pb-2.5 sm:pb-space-sm flex items-center justify-between pl-5 sm:pl-7 border-b border-surface-container/60">
+          <div className="flex items-center gap-2 sm:gap-space-sm">
             <button
               type="button"
               onClick={() => setModalNote(null)}
@@ -131,8 +131,8 @@ export default function NoteModal() {
           </div>
 
           {/* Right Header Actions */}
-          <div className="flex items-center gap-space-md">
-            <div className="flex items-center gap-1.5 font-caption text-caption text-outline">
+          <div className="flex items-center gap-2 sm:gap-space-md">
+            <div className="hidden sm:flex items-center gap-1.5 font-caption text-caption text-outline">
               <span
                 className={`w-2 h-2 rounded-full inline-block ${
                   hasUnsavedChanges ? 'bg-secondary animate-pulse' : 'bg-primary-container'
@@ -169,7 +169,7 @@ export default function NoteModal() {
         {/* Scrollable Body Canvas */}
         <div className="flex-1 overflow-y-auto flex flex-col">
           {/* Note Title Field */}
-          <div className="px-space-lg pt-space-md pb-space-xs pl-7">
+          <div className="px-4 sm:px-space-lg pt-3 sm:pt-space-md pb-1 sm:pb-space-xs pl-5 sm:pl-7">
             <input
               ref={titleInputRef}
               type="text"
@@ -180,18 +180,18 @@ export default function NoteModal() {
                 setHasUnsavedChanges(true);
               }}
               placeholder="Note title..."
-              className="w-full font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant bg-transparent outline-none py-1"
+              className="w-full font-headline-md text-xl sm:text-headline-md text-on-surface placeholder:text-outline-variant bg-transparent outline-none py-1"
             />
           </div>
 
           {/* Metadata & Classification Row */}
-          <div className="px-space-lg py-2.5 pl-7 flex flex-wrap items-center justify-between gap-y-3 gap-x-space-md bg-surface-container-low/50 border-y border-surface-container/60">
+          <div className="px-4 sm:px-space-lg py-2.5 pl-5 sm:pl-7 flex flex-wrap items-center justify-between gap-y-2.5 gap-x-space-md bg-surface-container-low/50 border-y border-surface-container/60">
             {/* Tag System */}
             <div className="flex items-center flex-wrap gap-1.5">
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed/60 text-primary font-caption text-caption"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:py-1 rounded-full bg-primary-fixed/60 text-primary font-caption text-caption"
                 >
                   <span>#{tag}</span>
                   <button
@@ -248,8 +248,8 @@ export default function NoteModal() {
           </div>
 
           {/* Editor Mode Tabs (Write vs Preview) */}
-          <div className="px-space-lg pl-7 pt-2 flex items-center justify-between text-caption font-caption text-on-surface-variant">
-            <div className="flex items-center gap-2">
+          <div className="px-4 sm:px-space-lg pl-5 sm:pl-7 pt-2 flex items-center justify-between text-caption font-caption text-on-surface-variant">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 type="button"
                 onClick={() => setActiveTab('write')}
@@ -274,13 +274,13 @@ export default function NoteModal() {
               </button>
             </div>
 
-            <div className="text-outline text-xs">
+            <div className="hidden sm:block text-outline text-xs">
               Supports Markdown (**bold**, _italic_, lists, code)
             </div>
           </div>
 
           {/* Main Content Area */}
-          <div className="px-space-lg py-space-sm pl-7 flex-1 min-h-[220px]">
+          <div className="px-4 sm:px-space-lg py-space-sm pl-5 sm:pl-7 flex-1 min-h-[200px] sm:min-h-[240px]">
             {activeTab === 'write' ? (
               <textarea
                 value={content}
@@ -289,11 +289,11 @@ export default function NoteModal() {
                   setHasUnsavedChanges(true);
                 }}
                 placeholder="Begin your reflection, draft, citation, or observation..."
-                rows={12}
-                className={`w-full h-full min-h-[220px] bg-transparent outline-none resize-none font-body-md text-body-md text-on-surface placeholder:text-outline-variant leading-relaxed ${getFontFamilyClass()}`}
+                rows={10}
+                className={`w-full h-full min-h-[200px] sm:min-h-[240px] bg-transparent outline-none resize-none font-body-md text-body-md text-on-surface placeholder:text-outline-variant leading-relaxed ${getFontFamilyClass()}`}
               />
             ) : (
-              <div className="prose max-w-none min-h-[220px] py-1 text-on-surface leading-relaxed">
+              <div className="prose dark:prose-invert max-w-none min-h-[200px] sm:min-h-[240px] py-1 text-on-surface leading-relaxed">
                 {content ? (
                   <ReactMarkdown>{content}</ReactMarkdown>
                 ) : (
@@ -305,14 +305,14 @@ export default function NoteModal() {
         </div>
 
         {/* Modal Action Footer */}
-        <footer className="px-space-lg py-space-sm pl-7 flex items-center justify-between border-t border-surface-container bg-surface-container-low/30">
+        <footer className="px-4 sm:px-space-lg py-2.5 sm:py-space-sm pl-5 sm:pl-7 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-0 border-t border-surface-container bg-surface-container-low/40">
           <div className="flex items-center gap-space-md text-caption font-caption text-outline">
             <span>{wordCount} words</span>
             <span>•</span>
             <span>~{readingTime} min read</span>
           </div>
 
-          <div className="flex items-center gap-space-sm">
+          <div className="flex items-center justify-end gap-2 sm:gap-space-sm">
             {!modalNote.isNew && (
               <button
                 type="button"
@@ -338,7 +338,7 @@ export default function NoteModal() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="px-5 py-2 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-label-md text-label-md transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-dark font-label-md text-label-md transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-base">check</span>
               <span>{saving ? 'Saving...' : 'Save Note'}</span>
@@ -348,4 +348,5 @@ export default function NoteModal() {
       </section>
     </div>
   );
+
 }

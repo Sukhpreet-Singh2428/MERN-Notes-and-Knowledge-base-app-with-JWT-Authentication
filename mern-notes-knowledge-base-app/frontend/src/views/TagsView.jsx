@@ -55,8 +55,8 @@ export default function TagsView() {
           </p>
         </div>
 
-        {/* Quick Metrics Ribbon */}
-        <div className="flex items-center gap-space-md self-start md:self-auto bg-surface-container-low/90 backdrop-blur-sm px-space-md py-space-sm rounded-xl shadow-sm">
+      {/* Quick Metrics Ribbon */}
+        <div className="flex items-center gap-space-md self-start sm:self-auto bg-surface-container-low/90 backdrop-blur-sm px-space-md py-space-sm rounded-xl shadow-sm">
           <div className="flex flex-col pr-space-md">
             <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider">
               Indexed Taxonomy
@@ -78,7 +78,7 @@ export default function TagsView() {
       </div>
 
       {/* Interactive Workspace Control Bar */}
-      <div className="relative z-10 bg-surface-container-lowest p-space-sm md:p-space-md rounded-xl shadow-[0_2px_8px_-2px_rgba(48,55,47,0.05),0_1px_3px_-1px_rgba(48,55,47,0.03)] border border-surface-container/60 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md mb-space-lg">
+      <div className="relative z-10 bg-surface-container-lowest p-space-sm md:p-space-md rounded-xl shadow-[0_2px_8px_-2px_rgba(48,55,47,0.05),0_1px_3px_-1px_rgba(48,55,47,0.03)] border border-surface-container/60 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-space-md mb-space-lg">
         {/* Search Filter */}
         <div className="flex-1 max-w-lg relative flex items-center">
           <span className="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-xl pointer-events-none">
@@ -103,16 +103,16 @@ export default function TagsView() {
         </div>
 
         {/* Controls: Sort & Create */}
-        <div className="flex flex-wrap items-center gap-space-sm justify-between lg:justify-end">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-space-sm justify-between lg:justify-end">
           <div className="relative flex items-center">
             <label className="sr-only" htmlFor="sort-tags">Sort Tags</label>
-            <div className="flex items-center gap-space-xs bg-surface-container-low px-space-md py-2 rounded-lg text-on-surface-variant font-label-md text-label-md">
+            <div className="flex items-center gap-space-xs bg-surface-container-low px-space-md py-2 rounded-lg text-on-surface-variant font-label-md text-label-md w-full sm:w-auto">
               <span className="material-symbols-outlined text-lg">swap_vert</span>
               <select
                 id="sort-tags"
                 value={tagSort}
                 onChange={(e) => setTagSort(e.target.value)}
-                className="bg-transparent text-on-surface font-label-md text-label-md outline-none cursor-pointer pr-1"
+                className="bg-transparent text-on-surface font-label-md text-label-md outline-none cursor-pointer pr-1 w-full sm:w-auto"
               >
                 <option value="count_desc">Sort by note count (high to low)</option>
                 <option value="count_asc">Sort by note count (low to high)</option>

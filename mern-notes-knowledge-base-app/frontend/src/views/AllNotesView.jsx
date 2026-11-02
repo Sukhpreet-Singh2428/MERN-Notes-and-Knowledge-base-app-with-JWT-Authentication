@@ -76,13 +76,13 @@ export default function AllNotesView() {
       </header>
 
       {/* Controls & Action Ribbon */}
-      <section className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md py-space-sm mb-space-lg bg-surface-container-low/70 backdrop-blur rounded-2xl p-space-sm">
+      <section className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-space-md py-space-sm mb-space-lg bg-surface-container-low/70 backdrop-blur rounded-2xl p-2.5 sm:p-space-sm border border-surface-container/60 shadow-sm">
         {/* Filter Chips */}
-        <div className="flex items-center gap-space-xs overflow-x-auto no-scrollbar py-1">
+        <div className="flex items-center gap-1.5 sm:gap-space-xs overflow-x-auto no-scrollbar py-1">
           <button
             type="button"
             onClick={() => setSelectedTag(null)}
-            className={`px-3.5 py-1.5 rounded-full font-label-md text-label-md shadow-sm transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+            className={`px-3 sm:px-3.5 py-1.5 rounded-full font-label-md text-label-md shadow-sm transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
               selectedTag === null
                 ? 'bg-surface-container text-primary font-semibold'
                 : 'bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
@@ -102,7 +102,7 @@ export default function AllNotesView() {
                 key={item.tag}
                 type="button"
                 onClick={() => setSelectedTag(isSelected ? null : item.tag)}
-                className={`px-3.5 py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer whitespace-nowrap ${
+                className={`px-3 sm:px-3.5 py-1.5 rounded-full font-label-md text-label-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                   isSelected
                     ? 'bg-primary-container text-on-primary font-medium'
                     : 'bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
@@ -115,10 +115,10 @@ export default function AllNotesView() {
         </div>
 
         {/* Dropdowns & Toolbar Actions */}
-        <div className="flex flex-wrap items-center gap-space-xs justify-end">
+        <div className="flex flex-wrap items-center gap-2 justify-between sm:justify-end">
           {/* Note Color Filter */}
-          <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-surface-container-lowest shadow-sm border border-surface-container/60">
-            <span className="material-symbols-outlined text-base text-secondary ml-1">palette</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-container-lowest shadow-sm border border-surface-container/60">
+            <span className="material-symbols-outlined text-base text-secondary">palette</span>
             <button
               type="button"
               onClick={() => setSelectedColor(null)}
@@ -142,55 +142,55 @@ export default function AllNotesView() {
             ))}
           </div>
 
-          {/* Sort Dropdown */}
-          <div className="relative flex items-center">
-            <label className="sr-only" htmlFor="sort-notes">
-              Sort notes
-            </label>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm shadow-sm border border-surface-container/60">
-              <span className="material-symbols-outlined text-base text-primary">swap_vert</span>
-              <select
-                id="sort-notes"
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="bg-transparent text-on-surface font-medium outline-none cursor-pointer pr-1 text-label-sm"
-              >
-                <option value="updated_desc">Updated: Newest</option>
-                <option value="updated_asc">Updated: Oldest</option>
-                <option value="created_desc">Created: Newest</option>
-                <option value="title_asc">Title: A–Z</option>
-              </select>
+          <div className="flex items-center gap-2">
+            {/* Sort Dropdown */}
+            <div className="relative flex items-center">
+              <label className="sr-only" htmlFor="sort-notes">
+                Sort notes
+              </label>
+              <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm shadow-sm border border-surface-container/60">
+                <span className="material-symbols-outlined text-base text-primary">swap_vert</span>
+                <select
+                  id="sort-notes"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  className="bg-transparent text-on-surface font-medium outline-none cursor-pointer pr-1 text-label-sm"
+                >
+                  <option value="updated_desc">Updated: Newest</option>
+                  <option value="updated_asc">Updated: Oldest</option>
+                  <option value="created_desc">Created: Newest</option>
+                  <option value="title_asc">Title: A–Z</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div className="w-px h-6 bg-surface-container-high mx-1"></div>
-
-          {/* View Switcher (Grid vs List) */}
-          <div className="flex items-center bg-surface-container-lowest p-0.5 rounded-xl shadow-sm border border-surface-container/60">
-            <button
-              type="button"
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-surface-container text-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-              title="Grid View"
-            >
-              <span className="material-symbols-outlined text-base">grid_view</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'list'
-                  ? 'bg-surface-container text-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-              title="List View"
-            >
-              <span className="material-symbols-outlined text-base">view_agenda</span>
-            </button>
+            {/* View Switcher (Grid vs List) */}
+            <div className="flex items-center bg-surface-container-lowest p-0.5 rounded-xl shadow-sm border border-surface-container/60">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-surface-container text-primary shadow-sm'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+                title="Grid View"
+              >
+                <span className="material-symbols-outlined text-base">grid_view</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                  viewMode === 'list'
+                    ? 'bg-surface-container text-primary shadow-sm'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+                title="List View"
+              >
+                <span className="material-symbols-outlined text-base">view_agenda</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -304,7 +304,7 @@ export default function AllNotesView() {
           <div
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-space-md'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
                 : 'flex flex-col gap-space-sm'
             }
           >
@@ -338,7 +338,7 @@ export default function AllNotesView() {
               <div
                 className={
                   viewMode === 'grid'
-                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-space-md'
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
                     : 'flex flex-col gap-space-sm'
                 }
               >
@@ -371,7 +371,7 @@ export default function AllNotesView() {
               <div
                 className={
                   viewMode === 'grid'
-                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-space-md'
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
                     : 'flex flex-col gap-space-sm'
                 }
               >

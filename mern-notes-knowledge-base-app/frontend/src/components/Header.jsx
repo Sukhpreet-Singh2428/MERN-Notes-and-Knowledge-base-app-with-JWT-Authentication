@@ -3,8 +3,15 @@ import { useNotes } from '../context/NotesContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 
 export default function Header() {
-  const { searchQuery, setSearchQuery, profile, activeView, setActiveView } = useNotes();
-  const { theme, toggleTheme } = useTheme();
+  const {
+    searchQuery,
+    setSearchQuery,
+    profile,
+    activeView,
+    setActiveView,
+    setIsMobileNavOpen,
+  } = useNotes();
+  const { theme, toggleTheme, isDark } = useTheme();
   const searchInputRef = useRef(null);
   const [showHelpModal, setShowHelpModal] = useState(false);
 
@@ -28,9 +35,35 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-[248px] right-0 h-[72px] bg-surface/80 backdrop-blur-xl z-30 flex items-center justify-between px-gutter shadow-[0_1px_8px_rgba(48,55,47,0.04)]">
+      <header className="fixed top-0 left-0 lg:left-[248px] right-0 h-[72px] bg-surface/85 backdrop-blur-xl z-30 flex items-center justify-between px-3 sm:px-6 lg:px-8 border-b border-surface-container/60 shadow-sm transition-all duration-200">
+        {/* Mobile Menu Toggle & Brand Icon */}
+        <div className="flex items-center gap-1 sm:gap-2 mr-2">
+          <button
+            type="button"
+            onClick={() => setIsMobileNavOpen(true)}
+            className="lg:hidden p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer flex items-center justify-center"
+            title="Open navigation menu"
+            aria-label="Open navigation menu"
+          >
+            <span className="material-symbols-outlined text-2xl">menu</span>
+          </button>
+
+          <div
+            onClick={() => setActiveView('all')}
+            className="lg:hidden flex items-center gap-1.5 cursor-pointer select-none"
+            title="Hearth Notes"
+          >
+            <div className="w-7 h-7 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-serif text-base font-bold shadow-sm">
+              H
+            </div>
+            <span className="hidden sm:inline font-headline-sm text-base text-primary font-medium tracking-tight">
+              Hearth
+            </span>
+          </div>
+        </div>
+
         {/* Search Bar Container */}
-        <div className="flex-1 max-w-xl">
+        <div className="flex-1 max-w-xl mx-1 sm:mx-4">
           <div className="relative flex items-center">
             <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-xl pointer-events-none">
               search
@@ -46,19 +79,19 @@ export default function Header() {
                   setActiveView('all');
                 }
               }}
-              placeholder="Search notes, ideas, tags, and excerpts..."
-              className="w-full pl-10 pr-24 py-2 bg-surface-container-lowest rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant/60 outline-none focus:ring-1 focus:ring-primary shadow-[0_1px_3px_-1px_rgba(48,55,47,0.03)] transition-all"
+              placeholder="Search notes, tags, ideas..."
+              className="w-full pl-9 sm:pl-10 pr-10 sm:pr-24 py-2 bg-surface-container-lowest rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant/60 outline-none focus:ring-1 focus:ring-primary shadow-sm border border-surface-container/60 transition-all"
             />
             {searchQuery ? (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 p-0.5 rounded text-on-surface-variant hover:text-on-surface transition-colors"
+                className="absolute right-2.5 p-0.5 rounded text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                 title="Clear search"
               >
                 <span className="material-symbols-outlined text-sm">close</span>
               </button>
             ) : (
-              <div className="absolute right-3 flex items-center px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-caption text-caption pointer-events-none">
+              <div className="absolute right-2.5 hidden sm:flex items-center px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-caption text-caption pointer-events-none">
                 Ctrl + K
               </div>
             )}
@@ -66,23 +99,23 @@ export default function Header() {
         </div>
 
         {/* Action Controls & Profile Avatar */}
-        <div className="flex items-center gap-space-md">
+        <div className="flex items-center gap-1 sm:gap-2 lg:gap-space-sm shrink-0">
           {/* Theme Switcher Button */}
           <button
             onClick={toggleTheme}
-            className="flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
-            title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+            className="flex items-center justify-center p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all cursor-pointer relative"
+            title={`Switch to ${isDark ? 'Light' : 'Dark'} Mode (Current: ${theme})`}
             aria-label="Toggle Theme"
           >
-            <span className="material-symbols-outlined text-xl">
-              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            <span className="material-symbols-outlined text-xl transition-transform duration-300 hover:rotate-45">
+              {isDark ? 'light_mode' : 'dark_mode'}
             </span>
           </button>
 
           {/* Quick Help Dialog Trigger */}
           <button
             onClick={() => setShowHelpModal(true)}
-            className="flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer"
+            className="flex items-center justify-center p-2 rounded-xl text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
             title="Shortcuts & System Help"
             aria-label="Help"
           >
@@ -91,16 +124,16 @@ export default function Header() {
 
           {/* Author Avatar with Online Indicator */}
           <div
-            className="relative cursor-pointer"
+            className="relative cursor-pointer ml-1"
             onClick={() => setActiveView('settings')}
             title="Profile & Settings"
           >
             <img
               alt={profile.displayName || 'Author'}
-              className="w-8 h-8 rounded-full object-cover ring-1 ring-surface-container-high"
+              className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20 hover:ring-primary-container transition-all"
               src={profile.avatarUrl}
             />
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-primary-container ring-2 ring-surface"></span>
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-surface"></span>
           </div>
         </div>
       </header>

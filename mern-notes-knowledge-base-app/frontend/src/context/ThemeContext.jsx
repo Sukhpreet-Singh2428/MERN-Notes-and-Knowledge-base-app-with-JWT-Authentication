@@ -15,21 +15,39 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('hearth_default_color') || 'default';
   });
 
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('hearth_theme') || 'light';
+    if (saved === 'dark') return true;
+    if (saved === 'system') return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return false;
+  });
+
   useEffect(() => {
     const root = document.documentElement;
     localStorage.setItem('hearth_theme', theme);
 
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else if (theme === 'light') {
-      root.classList.remove('dark');
-    } else if (theme === 'system') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (systemDark) {
+    const applyTheme = (dark) => {
+      setIsDark(dark);
+      if (dark) {
         root.classList.add('dark');
+        root.setAttribute('data-theme', 'dark');
       } else {
         root.classList.remove('dark');
+        root.setAttribute('data-theme', 'light');
       }
+    };
+
+    if (theme === 'dark') {
+      applyTheme(true);
+    } else if (theme === 'light') {
+      applyTheme(false);
+    } else if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(mediaQuery.matches);
+
+      const handler = (e) => applyTheme(e.matches);
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
     }
   }, [theme]);
 
@@ -42,7 +60,7 @@ export function ThemeProvider({ children }) {
   }, [defaultColor]);
 
   const toggleTheme = () => {
-    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   return (
@@ -51,6 +69,7 @@ export function ThemeProvider({ children }) {
         theme,
         setTheme: setThemeState,
         toggleTheme,
+        isDark,
         editorFont,
         setEditorFont,
         defaultColor,
@@ -69,3 +88,4 @@ export function useTheme() {
   }
   return context;
 }
+

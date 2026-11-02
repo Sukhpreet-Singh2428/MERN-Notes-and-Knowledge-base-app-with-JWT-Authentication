@@ -19,9 +19,16 @@ export function NotesProvider({ children }) {
     avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzu77tUsTobDgPKPcxam-Jtqr4Fu8NI1cTkdcoLdWdQu4iOafb1bLOSdD2DT3Qpea3as5Qjhgv-L5ZdghXwY-iz8hTTt9GzMVkCdqD-ZYj9JyFIcV5Z2qW4hJJ0_x0U5hdldOjehtgUiVfd8tS8nE6qYFywwwFmbYzp9zMerxJNHLzUX0r5g8eXqavwE1Q0giuhAtn8bnLOjtv5kwrfoVfKS06pikJ5coQhrKKRn5GSQkUL6rGQpal',
   });
 
+  // Mobile responsive drawer state
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const toggleMobileNav = useCallback(() => {
+    setIsMobileNavOpen((prev) => !prev);
+  }, []);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
+
 
   // Modal states
   const [modalNote, setModalNote] = useState(null); // null or note object
@@ -335,6 +342,9 @@ export function NotesProvider({ children }) {
         updateAuthorProfile,
         openCreateModal,
         openEditModal,
+        isMobileNavOpen,
+        setIsMobileNavOpen,
+        toggleMobileNav,
         showToast,
         hideToast,
       }}

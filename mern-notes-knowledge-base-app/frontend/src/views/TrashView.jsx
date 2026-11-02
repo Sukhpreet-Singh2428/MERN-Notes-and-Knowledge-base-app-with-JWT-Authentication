@@ -34,7 +34,7 @@ export default function TrashView() {
         </div>
 
         {/* Quick Stats Metric Pill */}
-        <div className="flex items-center gap-space-md self-start md:self-auto bg-surface-container-low px-space-md py-space-sm rounded-xl">
+        <div className="flex items-center gap-space-md self-start sm:self-auto bg-surface-container-low px-space-md py-space-sm rounded-xl">
           <div className="flex flex-col">
             <span className="font-caption text-caption text-on-surface-variant">
               Reclaimable
@@ -66,11 +66,11 @@ export default function TrashView() {
         </div>
 
         {trashCount > 0 && (
-          <div className="flex items-center gap-space-sm shrink-0 self-end sm:self-auto">
+          <div className="flex items-center gap-space-sm shrink-0 w-full sm:w-auto justify-end">
             <button
               type="button"
               onClick={() => setDeleteDialog({ type: 'empty_trash' })}
-              className="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-lowest text-secondary hover:bg-secondary hover:text-on-secondary transition-colors font-label-md text-label-md shadow-sm cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container-lowest text-secondary hover:bg-secondary hover:text-on-secondary transition-colors font-label-md text-label-md shadow-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-lg">delete_sweep</span>
               <span>Empty Trash ({trashCount})</span>
@@ -108,7 +108,7 @@ export default function TrashView() {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg'
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
               : 'flex flex-col gap-space-sm'
           }
         >

@@ -19,11 +19,11 @@ export default function DeleteModal() {
 
   return (
     <div
-      className="fixed inset-0 bg-[#2b322a]/40 backdrop-blur-[6px] z-50 flex items-center justify-center p-4 animate-in fade-in"
+      className="fixed inset-0 bg-[#171d16]/50 dark:bg-black/75 backdrop-blur-[6px] z-50 flex items-center justify-center p-4 animate-in fade-in"
       onClick={() => setDeleteDialog(null)}
     >
       <div
-        className="w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container p-6 flex flex-col gap-5 text-on-surface"
+        className="w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container p-5 sm:p-6 flex flex-col gap-5 text-on-surface"
         onClick={(e) => e.stopPropagation()}
         role="alertdialog"
         aria-modal="true"
@@ -62,18 +62,18 @@ export default function DeleteModal() {
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-2">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-2">
           <button
             type="button"
             onClick={() => setDeleteDialog(null)}
-            className="px-4 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-label-md text-label-md transition-colors cursor-pointer text-center"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleConfirm}
-            className="px-5 py-2 rounded-lg bg-error text-on-error hover:bg-[#a01515] font-label-md text-label-md transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2 rounded-lg bg-error text-on-error hover:bg-[#a01515] font-label-md text-label-md transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <span className="material-symbols-outlined text-base">
               {isEmptyTrash ? 'delete_sweep' : 'delete_forever'}
