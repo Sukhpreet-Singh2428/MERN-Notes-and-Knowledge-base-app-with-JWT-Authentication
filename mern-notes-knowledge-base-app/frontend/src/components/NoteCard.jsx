@@ -43,7 +43,7 @@ export default function NoteCard({ note, isListView = false }) {
       {/* Left Colored Accent Strip */}
       <div
         className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors"
-        style={{ backgroundColor: colorMeta.accent }}
+        style={{ backgroundColor: `var(--note-accent-${note.color || 'default'}, ${colorMeta.accent})` }}
       ></div>
 
       <div className={`flex flex-col gap-space-sm pl-2 ${isListView ? 'flex-1 min-w-0' : ''}`}>
@@ -56,8 +56,8 @@ export default function NoteCard({ note, isListView = false }) {
             }}
             className="px-2.5 py-1 rounded-full text-caption font-caption font-medium transition-colors hover:opacity-80"
             style={{
-              backgroundColor: `${colorMeta.accent}20`,
-              color: colorMeta.accent,
+              backgroundColor: `color-mix(in srgb, var(--note-accent-${note.color || 'default'}, ${colorMeta.accent}) 18%, transparent)`,
+              color: `var(--note-accent-${note.color || 'default'}, ${colorMeta.accent})`,
             }}
           >
             {primaryCategory}

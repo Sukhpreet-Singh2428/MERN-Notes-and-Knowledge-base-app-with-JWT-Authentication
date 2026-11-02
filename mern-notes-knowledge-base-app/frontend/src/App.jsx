@@ -14,7 +14,7 @@ import TagsView from './views/TagsView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 
 export default function App() {
-  const { activeView } = useNotes();
+  const { activeView, openCreateModal } = useNotes();
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -35,20 +35,31 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-      {/* Fixed Left Navigation Drawer */}
+    <div className="min-h-screen bg-background font-body-md text-on-surface antialiased transition-colors duration-200">
+      {/* Navigation Drawer (Desktop Fixed / Mobile Slide-in) */}
       <Sidebar />
 
       {/* Main Content Pane */}
-      <div className="pl-[248px]">
+      <div className="lg:pl-[248px] min-h-screen flex flex-col transition-all duration-200">
         {/* Fixed Top Header */}
         <Header />
 
         {/* Dynamic Editorial Content Horizon */}
-        <main className="w-full pt-[72px] px-gutter max-w-[1400px] mx-auto min-h-screen">
+        <main className="w-full pt-[72px] px-3.5 sm:px-6 lg:px-8 max-w-[1400px] mx-auto min-h-screen flex-1">
           {renderActiveView()}
         </main>
       </div>
+
+      {/* Mobile Floating Action Button (FAB) for Quick Note Creation */}
+      <button
+        type="button"
+        onClick={openCreateModal}
+        className="lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl hover:bg-primary-dark flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-surface"
+        title="Create New Note"
+        aria-label="Create New Note"
+      >
+        <span className="material-symbols-outlined text-2xl">add</span>
+      </button>
 
       {/* Global Interactive Overlays */}
       <NoteModal />
@@ -57,3 +68,4 @@ export default function App() {
     </div>
   );
 }
+

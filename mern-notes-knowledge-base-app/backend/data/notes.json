@@ -12,7 +12,7 @@
     "isArchived": false,
     "isDeleted": false,
     "createdAt": "2026-10-12T09:00:00.000Z",
-    "updatedAt": "2026-10-25T07:00:00.000Z"
+    "updatedAt": "2026-10-28T06:57:54.764Z"
   },
   {
     "id": "44c23139-cdc8-46cb-89e4-be8cf0616afa",
@@ -24,10 +24,10 @@
     ],
     "color": "terracotta",
     "isPinned": true,
-    "isArchived": false,
+    "isArchived": true,
     "isDeleted": false,
     "createdAt": "2026-10-20T14:00:00.000Z",
-    "updatedAt": "2026-10-24T10:00:00.000Z"
+    "updatedAt": "2026-10-28T07:06:58.944Z"
   },
   {
     "id": "832ec5a2-6795-41eb-b844-625176083cee",
@@ -56,10 +56,10 @@
     ],
     "color": "sage",
     "isPinned": true,
-    "isArchived": false,
+    "isArchived": true,
     "isDeleted": false,
     "createdAt": "2026-10-11T08:30:00.000Z",
-    "updatedAt": "2026-10-11T08:30:00.000Z"
+    "updatedAt": "2026-10-28T07:06:17.591Z"
   },
   {
     "id": "2c4d05db-60e8-4753-a151-3e1b5cacc2be",
@@ -104,11 +104,11 @@
     "color": "default",
     "isPinned": false,
     "isArchived": false,
-    "isDeleted": false,
+    "isDeleted": true,
     "createdAt": "2026-10-08T19:00:00.000Z",
-    "updatedAt": "2026-10-25T16:11:32.649Z",
-    "isTrash": false,
-    "deletedAt": null
+    "updatedAt": "2026-10-28T07:08:03.441Z",
+    "isTrash": true,
+    "deletedAt": "2026-10-28T07:08:03.441Z"
   },
   {
     "id": "a1f05279-853c-4d37-97d3-f67963dc2269",
@@ -121,9 +121,11 @@
     "color": "sage",
     "isPinned": false,
     "isArchived": false,
-    "isDeleted": false,
+    "isDeleted": true,
     "createdAt": "2026-10-06T13:00:00.000Z",
-    "updatedAt": "2026-10-06T13:00:00.000Z"
+    "updatedAt": "2026-10-28T07:08:09.293Z",
+    "isTrash": true,
+    "deletedAt": "2026-10-28T07:08:09.293Z"
   },
   {
     "id": "a19d0495-0af9-447e-8b4f-41110bbbf93c",
@@ -151,5 +153,33 @@
     "isDeleted": false,
     "createdAt": "2026-10-25T09:36:02.529Z",
     "updatedAt": "2026-10-26T05:44:19.538Z"
+  },
+  {
+    "id": "56d0986d-cd46-4da9-925e-1d5a2eb36423",
+    "title": "DSA_PREPARATION",
+    "content": "linked list , binary tree , Dynamic Programming , DFS , BFS",
+    "tags": [],
+    "color": "default",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "isTrash": false,
+    "deletedAt": null,
+    "createdAt": "2026-10-28T07:38:48.840Z",
+    "updatedAt": "2026-10-28T07:38:48.840Z"
+  },
+  {
+    "id": "ccc4df98-a6be-4923-8d4d-ef7565931286",
+    "title": "MERN_PROJECT",
+    "content": "",
+    "tags": [],
+    "color": "default",
+    "isPinned": false,
+    "isArchived": false,
+    "isDeleted": false,
+    "isTrash": false,
+    "deletedAt": null,
+    "createdAt": "2026-10-28T07:39:09.175Z",
+    "updatedAt": "2026-10-28T07:39:09.175Z"
   }
 ]

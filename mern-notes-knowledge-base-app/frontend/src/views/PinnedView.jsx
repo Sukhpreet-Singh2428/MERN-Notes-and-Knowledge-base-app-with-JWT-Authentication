@@ -30,7 +30,7 @@ export default function PinnedView() {
         </div>
 
         {/* Toolbar Controls */}
-        <div className="flex items-center gap-space-sm self-start md:self-auto">
+        <div className="flex items-center gap-2 sm:gap-space-sm self-start sm:self-auto flex-wrap">
           {/* Sort */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm shadow-sm border border-surface-container/60">
             <span className="material-symbols-outlined text-base text-primary">swap_vert</span>
@@ -112,7 +112,7 @@ export default function PinnedView() {
         <div
           className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-space-md'
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
               : 'flex flex-col gap-space-sm'
           }
         >

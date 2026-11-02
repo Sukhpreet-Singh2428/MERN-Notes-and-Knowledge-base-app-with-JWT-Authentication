@@ -56,7 +56,7 @@ export default function SettingsView() {
       </div>
 
       {/* Primary Settings Canvas / Card */}
-      <div className="max-w-[880px] mx-auto w-full bg-surface-container-lowest rounded-xl shadow-[0_1px_4px_rgba(48,55,47,0.06)] border border-surface-container/60 p-8 md:p-10 flex flex-col gap-10">
+      <div className="max-w-[880px] mx-auto w-full bg-surface-container-lowest rounded-xl sm:rounded-2xl shadow-[0_1px_4px_rgba(48,55,47,0.06)] border border-surface-container/60 p-4 sm:p-6 md:p-10 flex flex-col gap-8 md:gap-10">
         {/* Section 1: Profile Information */}
         <section className="flex flex-col gap-6">
           <div className="flex flex-col gap-1">
@@ -330,7 +330,7 @@ export default function SettingsView() {
                   Natural archival tone applied when creating quick entries.
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {[
                   { id: 'default', name: 'Warm Ivory', swatch: '#F7F5EF', subtitle: 'Warm Paper' },
                   { id: 'sage', name: 'Soft Sage', swatch: '#E0E9DE', subtitle: 'Botanical' },
