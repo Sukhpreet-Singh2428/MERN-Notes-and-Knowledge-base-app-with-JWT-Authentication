@@ -13,9 +13,14 @@ import jwt from 'jsonwebtoken';
  *  - Missing configuration throws at startup, not at runtime.
  */
 
-// ── Configuration ────────────────────────────────────────────────────────
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+// ── Configuration Helpers ────────────────────────────────────────────────
+function getJwtSecret() {
+  return process.env.JWT_SECRET;
+}
+
+function getJwtExpiresIn() {
+  return process.env.JWT_EXPIRES_IN || '7d';
+}
 
 /**
  * Generate a signed JWT for a given user.
@@ -25,7 +30,8 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
  * @throws {Error} If JWT_SECRET is not configured.
  */
 export function generateToken(userId) {
-  if (!JWT_SECRET) {
+  const secret = getJwtSecret();
+  if (!secret) {
     throw new Error(
       'JWT_SECRET is not defined. ' +
       'Please set JWT_SECRET in your .env file. ' +
@@ -39,9 +45,9 @@ export function generateToken(userId) {
 
   const payload = { userId: String(userId) };
 
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, secret, {
     algorithm: 'HS256',
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: getJwtExpiresIn(),
     issuer: 'hearth-notes',
     audience: 'hearth-notes-client',
   });
@@ -58,11 +64,12 @@ export function generateToken(userId) {
  * @throws {Error} If the token is invalid, expired, or the secret is missing.
  */
 export function verifyToken(token) {
-  if (!JWT_SECRET) {
+  const secret = getJwtSecret();
+  if (!secret) {
     throw new Error('JWT_SECRET is not defined.');
   }
 
-  return jwt.verify(token, JWT_SECRET, {
+  return jwt.verify(token, secret, {
     algorithms: ['HS256'],
     issuer: 'hearth-notes',
     audience: 'hearth-notes-client',
