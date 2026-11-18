@@ -3,7 +3,7 @@ import User from '../models/User.js';
 import { generateToken } from '../utils/jwt.js';
 import { serializeUser } from '../serializers/user.serializer.js';
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 12;
 
 /**
  * Authentication Service for Hearth Notes.
@@ -12,7 +12,7 @@ const SALT_ROUNDS = 10;
  * and JWT token generation.
  *
  * Security:
- *  - Passwords are hashed with bcryptjs (10 salt rounds).
+ *  - Passwords are hashed with bcryptjs (12 salt rounds).
  *  - Tokens are generated only for successful authentication.
  *  - User responses are sanitized through the centralized serializer.
  *  - Generic error messages prevent user enumeration.
