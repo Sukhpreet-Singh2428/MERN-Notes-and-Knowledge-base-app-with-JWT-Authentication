@@ -1,187 +1,182 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import FileStore from '../utils/fileStore.js';
-import crypto from 'node:crypto';
+import mongoose from 'mongoose';
+import Note from '../models/Note.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const NOTES_PATH = path.join(__dirname, '..', '..', 'data', 'notes.json');
-
-const store = new FileStore(NOTES_PATH);
-
-/** Seed data for first run */
-const SEED_NOTES = [
-  {
-    id: crypto.randomUUID(),
-    title: 'Literature Review: Cognitive Ergonomics in Digital Reading',
-    content: '### Core Hypotheses\n\nReading velocity in non-glare digital environments increases by **14%** when using warm background temperatures (approx 4500K color temperature equivalent).\n\n> "A quiet workspace allows cognitive synthesis to occur naturally, without premature crystallization of ideas."\n\n#### Key Observations:\n- Line length should strictly adhere to **50–75 characters per line** for sustained cognitive stamina.\n- Generous line height (`1.65–1.75`) reduces ocular jumping across dense paragraphs.\n- Tag hierarchies work best when descriptive rather than categorical.',
-    tags: ['research', 'cognition'],
-    color: 'sage',
-    isPinned: true,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-12T09:00:00.000Z',
-    updatedAt: '2026-10-25T07:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Autumn Garden & Herbal Teas Formulation',
-    content: 'Blending dried lemon verbena with wild sage and chamomile.\n\n**Proportions:** 3 parts verbena, 1 part sage.\n\nKeep steep time under 6 minutes for sweetness. Experiment with adding dried lavender buds for evening blends.',
-    tags: ['botany', 'journal'],
-    color: 'terracotta',
-    isPinned: true,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-20T14:00:00.000Z',
-    updatedAt: '2026-10-24T10:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Architectural Principles for Personal Knowledge Systems',
-    content: '## Key Principles\n\n- Atomic notes over monolithic logs\n- Bidirectional linkage is valuable only when context is maintained\n- Prefer descriptive titles as standalone claims\n- Review and prune weekly to maintain signal quality\n\n> "The value of a knowledge system is not in its size but in the connections between its parts."',
-    tags: ['systems', 'pkm'],
-    color: 'mustard',
-    isPinned: true,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-14T11:00:00.000Z',
-    updatedAt: '2026-10-14T11:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Quarterly Writing Goals & Manuscript Outlines',
-    content: 'Draft chapters 3 through 5 of the novella.\n\n**Daily routine:** Maintain 750 words daily morning routine before opening email or checking newsfeeds.\n\n### Milestones\n1. Chapter 3 first draft — Oct 20\n2. Chapter 4 outline — Oct 28\n3. Chapter 5 outline — Nov 5',
-    tags: ['writing', 'manuscript'],
-    color: 'sage',
-    isPinned: true,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-11T08:30:00.000Z',
-    updatedAt: '2026-10-11T08:30:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Meeting Reflections: Design System Tokens & Accessibility',
-    content: 'Contrast ratios for muted terracotta against warm ivory need careful check.\n\nEnsure **4.5:1 ratio** on small body copy before pushing updates to production design library.\n\n### Action Items\n- Audit all text-on-surface color combinations\n- Test with screen reader software\n- Document accessible alternatives for color-only indicators',
-    tags: ['work', 'design-tokens'],
-    color: 'default',
-    isPinned: false,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-12T16:00:00.000Z',
-    updatedAt: '2026-10-12T16:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Bread Baking: 78% Hydration Sourdough Schedule',
-    content: '### Process\n1. Autolyse 45m with warm water (28°C)\n2. 4 stretch-and-folds spaced 30m apart\n3. Bulk fermentation 4-5 hours at room temp\n4. Pre-shape and bench rest 20m\n5. Final shape and 14hr cold retardation in fridge\n\nThe long cold retard brings forward complex lactobacillus notes and a more open crumb structure.',
-    tags: ['baking', 'craft'],
-    color: 'default',
-    isPinned: false,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-10T07:00:00.000Z',
-    updatedAt: '2026-10-10T07:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Quotes on Stillness & Quiet Workspaces',
-    content: '> "In a culture of noise and speed, the quiet craftsperson holds an unspoken sanctuary."\n\nNotes from Cal Newport and May Sarton on intentional isolation.\n\n> "Solitude is the furnace wherein thoughts find their temper."\n\n> "The best thinking has been done in solitude." — Thomas Edison',
-    tags: ['reading', 'quotes'],
-    color: 'default',
-    isPinned: false,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-08T19:00:00.000Z',
-    updatedAt: '2026-10-08T19:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Graph Data Structures: BFS & DFS Revision',
-    content: '## Breadth-First Search (BFS)\n- Uses a **queue** (FIFO)\n- Explores neighbors level by level\n- Time: O(V + E), Space: O(V)\n\n## Depth-First Search (DFS)\n- Uses a **stack** (LIFO) or recursion\n- Explores as deep as possible before backtracking\n- Time: O(V + E), Space: O(V)\n\n### Connected Components\nRun DFS/BFS from each unvisited vertex to find all components.',
-    tags: ['DSA', 'revision'],
-    color: 'sage',
-    isPinned: false,
-    isArchived: false,
-    isDeleted: false,
-    createdAt: '2026-10-06T13:00:00.000Z',
-    updatedAt: '2026-10-06T13:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Archived: Old Reading List 2025',
-    content: 'Books completed in 2025:\n- *Thinking, Fast and Slow* — Daniel Kahneman\n- *Atomic Habits* — James Clear\n- *Deep Work* — Cal Newport\n- *The Art of Learning* — Josh Waitzkin',
-    tags: ['reading', 'archive'],
-    color: 'default',
-    isPinned: false,
-    isArchived: true,
-    isDeleted: false,
-    createdAt: '2025-12-31T23:00:00.000Z',
-    updatedAt: '2026-01-05T10:00:00.000Z'
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Deleted Draft: Untitled Experiment',
-    content: 'This was a scratchpad that did not work out. Can be restored if needed.',
-    tags: ['draft'],
-    color: 'default',
-    isPinned: false,
-    isArchived: false,
-    isDeleted: true,
-    createdAt: '2026-09-15T12:00:00.000Z',
-    updatedAt: '2026-09-20T15:00:00.000Z'
-  }
-];
-
+/**
+ * MongoDB Notes Repository for Hearth Notes.
+ *
+ * All operations are strictly scoped to the authenticated user ID at the query level.
+ * Cross-user access is impossible because queries always include { user: userId }.
+ */
 class NotesRepository {
-  /** Get all notes from file, initializing with seed data if needed */
-  async getAll() {
-    let notes = await store.read(null);
-    if (notes === null) {
-      // First run — seed
-      await store.write(SEED_NOTES);
-      return [...SEED_NOTES];
+  /**
+   * Find all notes belonging to a specific user, with optional filtering and sorting.
+   *
+   * @param {string|mongoose.Types.ObjectId} userId - Authenticated user's ID
+   * @param {Object} query - { view, search, tag, color, dateFrom, dateTo, sort }
+   * @returns {Promise<Array>} List of Mongoose Note documents
+   */
+  async findByUser(userId, query = {}) {
+    const { view = 'all', search, tag, color, dateFrom, dateTo, sort = 'updatedAt' } = query;
+
+    const filter = {
+      user: userId,
+    };
+
+    // ── View Filter ──────────────────────────────────────────────────
+    switch (view) {
+      case 'pinned':
+        filter.isDeleted = false;
+        filter.isArchived = false;
+        filter.isPinned = true;
+        break;
+      case 'archived':
+        filter.isDeleted = false;
+        filter.isArchived = true;
+        break;
+      case 'trash':
+        filter.$or = [{ isDeleted: true }, { isTrash: true }];
+        break;
+      case 'all':
+      default:
+        filter.isDeleted = false;
+        filter.isArchived = false;
+        break;
     }
-    if (!Array.isArray(notes)) return [];
-    return notes;
+
+    // ── Search Filter ────────────────────────────────────────────────
+    // Case-insensitive, matches title, content, or tags
+    if (search && search.trim()) {
+      const rawQ = search.trim();
+      const cleanQ = rawQ.replace(/^#+/, '').trim();
+      const escaped = cleanQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escaped, 'i');
+
+      const searchConditions = [
+        { title: { $regex: searchRegex } },
+        { content: { $regex: searchRegex } },
+        { tags: { $regex: searchRegex } },
+      ];
+
+      if (filter.$or) {
+        filter.$and = [{ $or: filter.$or }, { $or: searchConditions }];
+        delete filter.$or;
+      } else {
+        filter.$or = searchConditions;
+      }
+    }
+
+    // ── Tag Filter ───────────────────────────────────────────────────
+    if (tag && tag.trim()) {
+      const t = tag.trim().replace(/^#+/, '');
+      const escaped = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const tagRegex = new RegExp(`^${escaped}$`, 'i');
+      filter.tags = { $elemMatch: { $regex: tagRegex } };
+    }
+
+    // ── Color Filter ─────────────────────────────────────────────────
+    if (color && color.trim()) {
+      filter.color = color.trim();
+    }
+
+    // ── Date Range Filter ────────────────────────────────────────────
+    if (dateFrom || dateTo) {
+      const dateFilter = {};
+      if (dateFrom) {
+        const from = new Date(dateFrom);
+        if (!isNaN(from)) dateFilter.$gte = from;
+      }
+      if (dateTo) {
+        const to = new Date(dateTo);
+        if (!isNaN(to)) {
+          to.setHours(23, 59, 59, 999);
+          dateFilter.$lte = to;
+        }
+      }
+      if (Object.keys(dateFilter).length > 0) {
+        filter.createdAt = dateFilter;
+      }
+    }
+
+    // ── Sorting ──────────────────────────────────────────────────────
+    const sortField = sort === 'createdAt' ? 'createdAt' : 'updatedAt';
+    let sortOptions;
+    if (view === 'all') {
+      sortOptions = { isPinned: -1, [sortField]: -1 };
+    } else {
+      sortOptions = { [sortField]: -1 };
+    }
+
+    return Note.find(filter).sort(sortOptions);
   }
 
-  /** Find a single note by ID */
-  async findById(id) {
-    const notes = await this.getAll();
-    return notes.find(n => n.id === id) || null;
+  /**
+   * Find a single note by user and note ID.
+   *
+   * @param {string|mongoose.Types.ObjectId} userId - Authenticated user's ID
+   * @param {string} noteId - Note's ObjectId
+   * @returns {Promise<Object|null>} Note document or null
+   */
+  async findByIdAndUser(userId, noteId) {
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return null;
+    }
+    return Note.findOne({ _id: noteId, user: userId });
   }
 
-  /** Save the entire notes array to disk */
-  async saveAll(notes) {
-    await store.write(notes);
+  /**
+   * Create a new note belonging to the authenticated user.
+   *
+   * @param {string|mongoose.Types.ObjectId} userId - Authenticated user's ID
+   * @param {Object} data - Validated note data
+   * @returns {Promise<Object>} Created Note document
+   */
+  async create(userId, data) {
+    return Note.create({
+      user: userId,
+      title: data.title,
+      content: data.content || '',
+      tags: data.tags || [],
+      color: data.color || 'default',
+      isPinned: Boolean(data.isPinned),
+      isArchived: Boolean(data.isArchived),
+      isDeleted: false,
+      isTrash: false,
+      deletedAt: null,
+    });
   }
 
-  /** Add a new note */
-  async create(note) {
-    const notes = await this.getAll();
-    notes.push(note);
-    await this.saveAll(notes);
-    return note;
+  /**
+   * Update a note belonging to the authenticated user.
+   *
+   * @param {string|mongoose.Types.ObjectId} userId - Authenticated user's ID
+   * @param {string} noteId - Note ID
+   * @param {Object} updates - Fields to update
+   * @returns {Promise<Object|null>} Updated Note document or null
+   */
+  async update(userId, noteId, updates) {
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return null;
+    }
+    return Note.findOneAndUpdate(
+      { _id: noteId, user: userId },
+      { $set: updates },
+      { returnDocument: 'after', runValidators: true }
+    );
   }
 
-  /** Update an existing note by ID. Returns updated note or null. */
-  async update(id, updates) {
-    const notes = await this.getAll();
-    const idx = notes.findIndex(n => n.id === id);
-    if (idx === -1) return null;
-    notes[idx] = { ...notes[idx], ...updates, id, createdAt: notes[idx].createdAt };
-    await this.saveAll(notes);
-    return notes[idx];
-  }
-
-  /** Permanently remove a note by ID. Returns true if found and removed. */
-  async remove(id) {
-    const notes = await this.getAll();
-    const idx = notes.findIndex(n => n.id === id);
-    if (idx === -1) return false;
-    notes.splice(idx, 1);
-    await this.saveAll(notes);
-    return true;
+  /**
+   * Permanently delete a note belonging to the authenticated user.
+   *
+   * @param {string|mongoose.Types.ObjectId} userId - Authenticated user's ID
+   * @param {string} noteId - Note ID
+   * @returns {Promise<boolean>} True if removed, false otherwise
+   */
+  async remove(userId, noteId) {
+    if (!mongoose.Types.ObjectId.isValid(noteId)) {
+      return false;
+    }
+    const result = await Note.deleteOne({ _id: noteId, user: userId });
+    return result.deletedCount > 0;
   }
 }
 

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 import {
   getAllNotes,
   getNoteById,
@@ -8,10 +9,13 @@ import {
   toggleArchive,
   softDeleteNote,
   restoreNote,
-  permanentDeleteNote
+  permanentDeleteNote,
 } from '../controllers/notes.controller.js';
 
 const router = Router();
+
+// ── All Notes Endpoints Require JWT Authentication ────────────────────────
+router.use(authenticateToken);
 
 router.get('/', getAllNotes);
 router.get('/:id', getNoteById);

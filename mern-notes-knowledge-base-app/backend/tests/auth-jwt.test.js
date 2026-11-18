@@ -572,8 +572,17 @@ describe('Existing JSON-based APIs remain functional', () => {
     expect(res.body.data.status).toBe('ok');
   });
 
-  it('GET /api/notes should return notes (JSON-based)', async () => {
-    const res = await request.get('/api/notes').expect(200);
+  it('GET /api/notes should require authentication and return notes when authenticated', async () => {
+    // Unauthenticated request is rejected with 401
+    await request.get('/api/notes').expect(401);
+
+    // Authenticated request succeeds
+    const regRes = await request.post('/api/auth/register').send(TEST_USER);
+    const res = await request
+      .get('/api/notes')
+      .set('Authorization', `Bearer ${regRes.body.data.token}`)
+      .expect(200);
+
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data)).toBe(true);
   });
