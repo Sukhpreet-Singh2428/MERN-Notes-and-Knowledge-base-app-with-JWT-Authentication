@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import notesRoutes from './routes/notes.routes.js';
 import profileRoutes from './routes/profile.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import { notFound } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -48,6 +49,7 @@ app.get('/', (req, res) => {
     frontendUrl: 'http://localhost:3000',
     endpoints: {
       health: '/api/health',
+      auth: '/api/auth',
       notes: '/api/notes',
       profile: '/api/profile',
     },
@@ -67,6 +69,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 app.use('/api/profile', profileRoutes);
 
