@@ -1,34 +1,43 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import FileStore from '../utils/fileStore.js';
+import User from '../models/User.js';
+import { serializeUser } from '../serializers/user.serializer.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PROFILE_PATH = path.join(__dirname, '..', '..', 'data', 'profile.json');
-
-const store = new FileStore(PROFILE_PATH);
-
-const DEFAULT_PROFILE = {
-  displayName: 'Elena Rostova',
-  bio: 'Writer & Researcher',
-  avatarUrl: '',
-  theme: 'light'
-};
-
+/**
+ * Profile Repository — MongoDB-backed.
+ *
+ * Replaces the former JSON file-based repository.
+ * All operations use the authenticated user's ID (never client-supplied).
+ */
 class ProfileRepository {
-  async get() {
-    let profile = await store.read(null);
-    if (profile === null) {
-      await store.write(DEFAULT_PROFILE);
-      return { ...DEFAULT_PROFILE };
-    }
-    return profile;
+  /**
+   * Retrieve the authenticated user's profile from MongoDB.
+   *
+   * @param {string} userId - The authenticated user's MongoDB ObjectId string.
+   * @returns {Object|null} Serialized safe user object, or null if not found.
+   */
+  async getByUserId(userId) {
+    const user = await User.findById(userId).select('-password');
+    if (!user) return null;
+    return serializeUser(user);
   }
 
-  async update(updates) {
-    const profile = await this.get();
-    const updated = { ...profile, ...updates };
-    await store.write(updated);
-    return updated;
+  /**
+   * Update the authenticated user's profile in MongoDB.
+   *
+   * Only receives pre-validated, whitelisted fields from the service layer.
+   *
+   * @param {string} userId - The authenticated user's MongoDB ObjectId string.
+   * @param {Object} updates - Whitelisted field updates.
+   * @returns {Object|null} Serialized safe user object after update, or null.
+   */
+  async updateByUserId(userId, updates) {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: updates },
+      { returnDocument: 'after', runValidators: true }
+    ).select('-password');
+
+    if (!user) return null;
+    return serializeUser(user);
   }
 }
 

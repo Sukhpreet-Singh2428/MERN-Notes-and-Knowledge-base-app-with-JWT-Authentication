@@ -587,9 +587,9 @@ describe('Existing JSON-based APIs remain functional', () => {
     expect(Array.isArray(res.body.data)).toBe(true);
   });
 
-  it('GET /api/profile should return profile (JSON-based)', async () => {
-    const res = await request.get('/api/profile').expect(200);
-    expect(res.body.success).toBe(true);
+  it('GET /api/profile should require authentication (MongoDB-backed)', async () => {
+    const res = await request.get('/api/profile').expect(401);
+    expect(res.body.success).toBe(false);
   });
 
   it('should return 404 for undefined routes', async () => {
