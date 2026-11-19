@@ -16,6 +16,12 @@
  */
 
 import 'dotenv/config';
+
+// ── Ensure JWT environment variables are available for test suite ─────────
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-that-is-long-enough-for-hs256-signing-algorithm-testing';
+process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
+process.env.NODE_ENV = 'test';
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import supertest from 'supertest';
 import mongoose from 'mongoose';
@@ -634,27 +640,18 @@ describe('Cross-User Security — Strict Isolation between User A and User B', (
 // ═══════════════════════════════════════════════════════════════════════════
 // 7. REGRESSION VERIFICATION (JSON Profile API remains functional)
 // ═══════════════════════════════════════════════════════════════════════════
-describe('Regression Verification — JSON Profile API remains functional', () => {
-  it('GET /api/profile should continue working without authentication', async () => {
-    const res = await request.get('/api/profile').expect(200);
-    expect(res.body.success).toBe(true);
-    expect(res.body.data).toBeDefined();
-    expect(res.body.data.displayName).toBeDefined();
+describe('Regression Verification — Profile API now requires authentication', () => {
+  it('GET /api/profile should require authentication (MongoDB-backed)', async () => {
+    const res = await request.get('/api/profile').expect(401);
+    expect(res.body.success).toBe(false);
   });
 
-  it('PUT /api/profile should continue updating profile JSON', async () => {
-    const original = await request.get('/api/profile');
-    const originalBio = original.body.data.bio;
-
+  it('PUT /api/profile should require authentication (MongoDB-backed)', async () => {
     const res = await request
       .put('/api/profile')
-      .send({ bio: 'Updated Bio via Profile API' })
-      .expect(200);
+      .send({ bio: 'Attempted unauthenticated update' })
+      .expect(401);
 
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.bio).toBe('Updated Bio via Profile API');
-
-    // Restore original profile state
-    await request.put('/api/profile').send({ bio: originalBio });
+    expect(res.body.success).toBe(false);
   });
 });

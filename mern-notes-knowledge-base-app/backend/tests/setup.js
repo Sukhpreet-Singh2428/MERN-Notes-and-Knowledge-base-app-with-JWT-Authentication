@@ -6,6 +6,10 @@
  */
 import mongoose from 'mongoose';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-that-is-long-enough-for-hs256-signing-algorithm-testing';
+process.env.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
+process.env.NODE_ENV = 'test';
+
 const TEST_DB_URI = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/hearth_notes_test';
 
 let mongoMemoryServerInstance = null;
