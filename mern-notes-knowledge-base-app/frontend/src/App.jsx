@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from './context/AuthContext.jsx';
 import { useNotes } from './context/NotesContext.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 import NoteModal from './components/NoteModal.jsx';
 import DeleteModal from './components/DeleteModal.jsx';
 import Toast from './components/Toast.jsx';
+
+import LoginView from './views/LoginView.jsx';
+import RegisterView from './views/RegisterView.jsx';
 
 import AllNotesView from './views/AllNotesView.jsx';
 import PinnedView from './views/PinnedView.jsx';
@@ -14,7 +18,32 @@ import TagsView from './views/TagsView.jsx';
 import SettingsView from './views/SettingsView.jsx';
 
 export default function App() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const [authView, setAuthView] = useState('login'); // 'login' | 'register'
   const { activeView, openCreateModal } = useNotes();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-serif text-2xl font-bold shadow-sm mb-4">
+          H
+        </div>
+        <div className="flex items-center gap-2.5 text-on-surface-variant font-body-sm">
+          <span className="material-symbols-outlined text-primary text-xl animate-spin">
+            progress_activity
+          </span>
+          <span>Loading Hearth Notes...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    if (authView === 'register') {
+      return <RegisterView onSwitchToLogin={() => setAuthView('login')} />;
+    }
+    return <LoginView onSwitchToRegister={() => setAuthView('register')} />;
+  }
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -68,4 +97,3 @@ export default function App() {
     </div>
   );
 }
-

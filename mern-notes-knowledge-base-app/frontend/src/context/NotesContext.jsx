@@ -1,9 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import notesApi from '../api/notesApi.js';
+import { useAuth } from './AuthContext.jsx';
 
 const NotesContext = createContext();
 
+const DEFAULT_AVATAR =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuBzu77tUsTobDgPKPcxam-Jtqr4Fu8NI1cTkdcoLdWdQu4iOafb1bLOSdD2DT3Qpea3as5Qjhgv-L5ZdghXwY-iz8hTTt9GzMVkCdqD-ZYj9JyFIcV5Z2qW4hJJ0_x0U5hdldOjehtgUiVfd8tS8nE6qYFywwwFmbYzp9zMerxJNHLzUX0r5g8eXqavwE1Q0giuhAtn8bnLOjtv5kwrfoVfKS06pikJ5coQhrKKRn5GSQkUL6rGQpal';
+
 export function NotesProvider({ children }) {
+  const { user: authUser, isAuthenticated } = useAuth();
+
   const [notes, setNotes] = useState([]);
   const [activeView, setActiveView] = useState('all'); // 'all' | 'pinned' | 'archived' | 'trash' | 'tags' | 'settings'
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,12 +18,25 @@ export function NotesProvider({ children }) {
   const [sort, setSort] = useState('updated_desc');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
-  const [profile, setProfile] = useState({
-    displayName: 'Elena Rostova',
-    bio: 'Writer & Botanical Researcher',
-    email: 'elena.rostova@hearthnotes.local',
-    avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBzu77tUsTobDgPKPcxam-Jtqr4Fu8NI1cTkdcoLdWdQu4iOafb1bLOSdD2DT3Qpea3as5Qjhgv-L5ZdghXwY-iz8hTTt9GzMVkCdqD-ZYj9JyFIcV5Z2qW4hJJ0_x0U5hdldOjehtgUiVfd8tS8nE6qYFywwwFmbYzp9zMerxJNHLzUX0r5g8eXqavwE1Q0giuhAtn8bnLOjtv5kwrfoVfKS06pikJ5coQhrKKRn5GSQkUL6rGQpal',
-  });
+  const [profile, setProfile] = useState(() => ({
+    displayName: authUser?.displayName || 'Elena Rostova',
+    bio: authUser?.bio || 'Writer & Botanical Researcher',
+    email: authUser?.email || 'elena.rostova@hearthnotes.local',
+    avatarUrl: authUser?.avatarUrl || DEFAULT_AVATAR,
+  }));
+
+  // Synchronize initial profile state with authenticated user
+  useEffect(() => {
+    if (authUser) {
+      setProfile((prev) => ({
+        ...prev,
+        displayName: authUser.displayName || prev.displayName,
+        bio: authUser.bio !== undefined ? authUser.bio : prev.bio,
+        email: authUser.email || prev.email,
+        avatarUrl: authUser.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
+      }));
+    }
+  }, [authUser]);
 
   // Mobile responsive drawer state
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -28,7 +47,6 @@ export function NotesProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
-
 
   // Modal states
   const [modalNote, setModalNote] = useState(null); // null or note object
@@ -42,21 +60,31 @@ export function NotesProvider({ children }) {
     setToast(null);
   }, []);
 
-  // Fetch initial profile
+  // Fetch author profile only when authenticated
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     notesApi
       .getProfile()
       .then((res) => {
-        if (res.data) setProfile(res.data);
+        if (res.data) {
+          setProfile((prev) => ({
+            ...prev,
+            ...res.data,
+            avatarUrl: res.data.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
+          }));
+        }
       })
       .catch((err) => {
         console.warn('Profile fetch warning:', err.message);
       });
-  }, []);
+  }, [isAuthenticated]);
 
   // Global counts across all states
   const [allNotesData, setAllNotesData] = useState([]);
   const refreshGlobalCounts = useCallback(async () => {
+    if (!isAuthenticated) return;
+
     try {
       const [allActive, archived, trash] = await Promise.all([
         notesApi.getNotes({ view: 'all' }),
@@ -72,10 +100,12 @@ export function NotesProvider({ children }) {
     } catch {
       // Ignore background badge error
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Fetch notes from backend
   const loadNotes = useCallback(async () => {
+    if (!isAuthenticated) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -108,15 +138,25 @@ export function NotesProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [activeView, searchQuery, selectedTag, selectedColor, sort]);
+  }, [isAuthenticated, activeView, searchQuery, selectedTag, selectedColor, sort]);
+
+  // Only load notes when authenticated; clear state when logged out
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadNotes();
+    } else {
+      setNotes([]);
+      setAllNotesData([]);
+      setLoading(false);
+      setError(null);
+    }
+  }, [isAuthenticated, loadNotes]);
 
   useEffect(() => {
-    loadNotes();
-  }, [loadNotes]);
-
-  useEffect(() => {
-    refreshGlobalCounts();
-  }, [notes, refreshGlobalCounts]);
+    if (isAuthenticated) {
+      refreshGlobalCounts();
+    }
+  }, [isAuthenticated, notes, refreshGlobalCounts]);
 
   // Compute live counts
   const counts = useMemo(() => {
@@ -279,7 +319,11 @@ export function NotesProvider({ children }) {
   const updateAuthorProfile = async (profileData) => {
     try {
       const res = await notesApi.updateProfile(profileData);
-      setProfile(res.data);
+      setProfile((prev) => ({
+        ...prev,
+        ...res.data,
+        avatarUrl: res.data?.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
+      }));
       showToast('Preferences saved successfully', 'success');
       return res.data;
     } catch (err) {

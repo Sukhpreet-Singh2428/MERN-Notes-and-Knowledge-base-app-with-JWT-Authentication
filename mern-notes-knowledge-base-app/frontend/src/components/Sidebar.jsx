@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Sidebar() {
   const {
@@ -13,6 +14,7 @@ export default function Sidebar() {
     isMobileNavOpen,
     setIsMobileNavOpen,
   } = useNotes();
+  const { logout } = useAuth();
 
   const handleNavClick = (view) => {
     setActiveView(view);
@@ -26,6 +28,11 @@ export default function Sidebar() {
   const handleCreateNote = () => {
     openCreateModal();
     setIsMobileNavOpen(false);
+  };
+
+  const handleLogout = () => {
+    setIsMobileNavOpen(false);
+    logout();
   };
 
   const navItems = [
@@ -133,11 +140,11 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        {/* Footer Section: Settings & Author Profile Card */}
+        {/* Footer Section: Settings, Sign Out & Author Profile Card */}
         <div className="flex flex-col gap-space-sm pt-space-sm">
           <div className="h-px w-full bg-surface-container-high"></div>
 
-          <nav className="flex flex-col">
+          <nav className="flex flex-col gap-1">
             <button
               onClick={() => handleNavClick('settings')}
               className={`flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-colors cursor-pointer text-left ${
@@ -148,6 +155,16 @@ export default function Sidebar() {
             >
               <span className="material-symbols-outlined text-xl">settings</span>
               <span>Settings</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-space-sm px-space-sm py-2 rounded-lg transition-colors cursor-pointer text-left text-on-surface-variant hover:bg-surface-container-high hover:text-error font-body-md text-body-md"
+              title="Sign out of your account"
+            >
+              <span className="material-symbols-outlined text-xl">logout</span>
+              <span>Sign Out</span>
             </button>
           </nav>
 
@@ -164,10 +181,10 @@ export default function Sidebar() {
             />
             <div className="flex flex-col min-w-0">
               <span className="font-label-md text-label-md text-on-surface truncate">
-                {profile.displayName || 'Elena Rostova'}
+                {profile.displayName || 'Author'}
               </span>
               <span className="font-caption text-caption text-on-surface-variant truncate">
-                {profile.bio || 'Writer & Researcher'}
+                {profile.bio || 'Researcher'}
               </span>
             </div>
           </div>
@@ -176,4 +193,3 @@ export default function Sidebar() {
     </>
   );
 }
-
