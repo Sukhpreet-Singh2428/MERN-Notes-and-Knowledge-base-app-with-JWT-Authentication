@@ -17,6 +17,7 @@ export default function PinnedView() {
     isFiltering,
     clearFilters,
     allNotesData,
+    loadNotes,
   } = useNotes();
 
   return (
@@ -100,8 +101,18 @@ export default function PinnedView() {
       )}
 
       {error && (
-        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4">
-          Error loading notes: {error}
+        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4 flex items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg">error</span>
+            <span>Error loading notes: {error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={loadNotes}
+            className="px-3 py-1 rounded-lg bg-surface-container-lowest text-error hover:bg-surface-container font-label-sm text-label-sm shadow-xs transition-colors cursor-pointer shrink-0"
+          >
+            Retry
+          </button>
         </div>
       )}
 

@@ -13,10 +13,13 @@ export default function NoteModal() {
   const [tags, setTags] = useState([]);
   const [color, setColor] = useState('default');
   const [isPinned, setIsPinned] = useState(false);
+  const [isArchived, setIsArchived] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [activeTab, setActiveTab] = useState('write'); // 'write' | 'preview'
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [validationError, setValidationError] = useState(null);
+  const [saveError, setSaveError] = useState(null);
 
   const titleInputRef = useRef(null);
 
@@ -27,8 +30,11 @@ export default function NoteModal() {
       setTags(Array.isArray(modalNote.tags) ? [...modalNote.tags] : []);
       setColor(modalNote.color || 'default');
       setIsPinned(Boolean(modalNote.isPinned));
+      setIsArchived(Boolean(modalNote.isArchived));
       setActiveTab('write');
       setHasUnsavedChanges(false);
+      setValidationError(null);
+      setSaveError(null);
 
       // Auto-focus title on open
       setTimeout(() => {
@@ -36,6 +42,18 @@ export default function NoteModal() {
       }, 50);
     }
   }, [modalNote]);
+
+  // Close on Escape key press
+  useEffect(() => {
+    if (!modalNote) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !saving) {
+        setModalNote(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [modalNote, saving, setModalNote]);
 
   if (!modalNote) return null;
 
@@ -59,19 +77,31 @@ export default function NoteModal() {
   };
 
   const handleSave = async () => {
-    if (!title.trim() && !content.trim()) {
-      setModalNote(null);
+    if (saving) return;
+
+    if (!title.trim()) {
+      setValidationError('Title is required to save a note.');
+      titleInputRef.current?.focus();
+      return;
+    }
+
+    if (title.trim().length > 200) {
+      setValidationError('Title must be 200 characters or fewer.');
+      titleInputRef.current?.focus();
       return;
     }
 
     try {
       setSaving(true);
+      setValidationError(null);
+      setSaveError(null);
       const payload = {
         title: title.trim(),
         content,
         tags,
         color,
         isPinned,
+        isArchived,
       };
 
       if (modalNote.isNew) {
@@ -79,6 +109,8 @@ export default function NoteModal() {
       } else {
         await updateNote(modalNote.id || modalNote._id, payload);
       }
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save note. Please check inputs and try again.');
     } finally {
       setSaving(false);
     }
@@ -141,6 +173,27 @@ export default function NoteModal() {
               <span>{hasUnsavedChanges ? 'Unsaved edits' : 'Synced'}</span>
             </div>
 
+            {/* Archive State Toggle in Edit Mode */}
+            {!modalNote.isNew && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsArchived(!isArchived);
+                  setHasUnsavedChanges(true);
+                }}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-label-sm text-label-sm transition-colors cursor-pointer ${
+                  isArchived
+                    ? 'bg-surface-container-highest text-on-surface font-medium'
+                    : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
+                }`}
+                title={isArchived ? 'Note is archived' : 'Archive note'}
+                aria-label={isArchived ? 'Note is archived' : 'Archive note'}
+              >
+                <span className="material-symbols-outlined text-base">archive</span>
+                <span className="font-medium">{isArchived ? 'Archived' : 'Archive'}</span>
+              </button>
+            )}
+
             {/* Pinned State Toggle */}
             <button
               type="button"
@@ -153,6 +206,8 @@ export default function NoteModal() {
                   ? 'bg-secondary-fixed text-on-secondary-container'
                   : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
               }`}
+              title={isPinned ? 'Note is pinned' : 'Pin note'}
+              aria-label={isPinned ? 'Note is pinned' : 'Pin note'}
             >
               <span
                 className={`material-symbols-outlined text-base ${
@@ -178,11 +233,37 @@ export default function NoteModal() {
               onChange={(e) => {
                 setTitle(e.target.value);
                 setHasUnsavedChanges(true);
+                if (validationError) setValidationError(null);
+                if (saveError) setSaveError(null);
               }}
-              placeholder="Note title..."
+              placeholder="Note title (required)..."
+              aria-label="Note title"
               className="w-full font-headline-md text-xl sm:text-headline-md text-on-surface placeholder:text-outline-variant bg-transparent outline-none py-1"
             />
           </div>
+
+          {/* Validation or Save Error Banner */}
+          {(validationError || saveError) && (
+            <div className="mx-4 sm:mx-space-lg ml-5 sm:ml-7 mb-2 px-3 py-1.5 rounded-lg bg-error-container text-error font-body-sm text-xs flex items-center justify-between gap-2 shadow-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">
+                  {validationError ? 'warning' : 'error'}
+                </span>
+                <span>{validationError || saveError}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setValidationError(null);
+                  setSaveError(null);
+                }}
+                className="hover:opacity-80 p-0.5 rounded cursor-pointer"
+                aria-label="Dismiss message"
+              >
+                <span className="material-symbols-outlined text-xs">close</span>
+              </button>
+            </div>
+          )}
 
           {/* Metadata & Classification Row */}
           <div className="px-4 sm:px-space-lg py-2.5 pl-5 sm:pl-7 flex flex-wrap items-center justify-between gap-y-2.5 gap-x-space-md bg-surface-container-low/50 border-y border-surface-container/60">
@@ -197,6 +278,7 @@ export default function NoteModal() {
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(tag)}
+                    aria-label={`Remove tag ${tag}`}
                     className="hover:text-error transition-colors flex items-center cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-xs">close</span>
@@ -213,6 +295,7 @@ export default function NoteModal() {
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={handleAddTag}
                   placeholder="Add Tag"
+                  aria-label="Add new tag"
                   className="bg-transparent outline-none w-20 text-on-surface placeholder:text-outline text-caption py-0.5"
                 />
               </div>
@@ -227,6 +310,7 @@ export default function NoteModal() {
                     key={key}
                     type="button"
                     title={val.name}
+                    aria-label={`Select color ${val.name}`}
                     onClick={() => {
                       setColor(key);
                       setHasUnsavedChanges(true);
@@ -289,6 +373,7 @@ export default function NoteModal() {
                   setHasUnsavedChanges(true);
                 }}
                 placeholder="Begin your reflection, draft, citation, or observation..."
+                aria-label="Note content"
                 rows={10}
                 className={`w-full h-full min-h-[200px] sm:min-h-[240px] bg-transparent outline-none resize-none font-body-md text-body-md text-on-surface placeholder:text-outline-variant leading-relaxed ${getFontFamilyClass()}`}
               />
@@ -341,7 +426,7 @@ export default function NoteModal() {
               className="px-5 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-dark font-label-md text-label-md transition-colors shadow-sm flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-base">check</span>
-              <span>{saving ? 'Saving...' : 'Save Note'}</span>
+              <span>{saving ? 'Saving...' : modalNote.isNew ? 'Create Note' : 'Save Changes'}</span>
             </button>
           </div>
         </footer>

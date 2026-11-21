@@ -24,6 +24,8 @@ export default function AllNotesView() {
     tagsSummary,
     isFiltering,
     clearFilters,
+    allNotesData,
+    loadNotes,
   } = useNotes();
 
   // Separate pinned and unpinned notes when viewing default unfiltered library
@@ -200,7 +202,7 @@ export default function AllNotesView() {
       <FilterBanner />
 
       {/* Loading & Error States */}
-      {loading && notes.length === 0 && (
+      {loading && allNotesData.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-on-surface-variant">
           <span className="material-symbols-outlined text-4xl animate-spin text-primary">
             progress_activity
@@ -210,8 +212,18 @@ export default function AllNotesView() {
       )}
 
       {error && (
-        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4">
-          Error loading notes: {error}
+        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4 flex items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg">error</span>
+            <span>Error loading notes: {error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={loadNotes}
+            className="px-3 py-1 rounded-lg bg-surface-container-lowest text-error hover:bg-surface-container font-label-sm text-label-sm shadow-xs transition-colors cursor-pointer shrink-0"
+          >
+            Retry
+          </button>
         </div>
       )}
 

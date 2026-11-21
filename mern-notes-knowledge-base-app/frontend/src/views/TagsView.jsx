@@ -2,8 +2,17 @@ import React, { useState, useMemo } from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
 
 export default function TagsView() {
-  const { tagsSummary, counts, setActiveView, setSelectedTag, openCreateModal, loading, error } =
-    useNotes();
+  const {
+    tagsSummary,
+    counts,
+    setActiveView,
+    setSelectedTag,
+    openCreateModal,
+    loading,
+    error,
+    allNotesData,
+    loadNotes,
+  } = useNotes();
   const [tagSearch, setTagSearch] = useState('');
   const [tagSort, setTagSort] = useState('count_desc');
 
@@ -133,7 +142,7 @@ export default function TagsView() {
       </div>
 
       {/* Loading */}
-      {loading && (
+      {loading && allNotesData.length === 0 && (
         <div className="flex items-center justify-center py-20 text-on-surface-variant">
           <span className="material-symbols-outlined text-3xl animate-spin text-primary">
             progress_activity
@@ -142,8 +151,18 @@ export default function TagsView() {
       )}
 
       {error && (
-        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4">
-          Error loading tags: {error}
+        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4 flex items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg">error</span>
+            <span>Error loading tags: {error}</span>
+          </div>
+          <button
+            type="button"
+            onClick={loadNotes}
+            className="px-3 py-1 rounded-lg bg-surface-container-lowest text-error hover:bg-surface-container font-label-sm text-label-sm shadow-xs transition-colors cursor-pointer shrink-0"
+          >
+            Retry
+          </button>
         </div>
       )}
 
@@ -151,14 +170,37 @@ export default function TagsView() {
       {!loading && !error && filteredTags.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-md mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary mb-4 shadow-sm">
-            <span className="material-symbols-outlined text-3xl">label_off</span>
+            <span className="material-symbols-outlined text-3xl">
+              {tagSearch ? 'search_off' : 'label_off'}
+            </span>
           </div>
           <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">
-            No tags found
+            {tagSearch ? 'No matching tags' : 'No tags found'}
           </h3>
           <p className="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
-            {tagSearch ? 'No tags match your search query.' : 'Add tags to your notes to start categorizing your knowledge base.'}
+            {tagSearch
+              ? 'No tags match your search query. Try adjusting your search term.'
+              : 'Add tags to your notes to start categorizing your knowledge base.'}
           </p>
+          {tagSearch ? (
+            <button
+              type="button"
+              onClick={() => setTagSearch('')}
+              className="px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-lg">close</span>
+              <span>Clear Tag Search</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCreateNewTag}
+              className="px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-lg">bookmark_add</span>
+              <span>Create First Tag</span>
+            </button>
+          )}
         </div>
       )}
 
