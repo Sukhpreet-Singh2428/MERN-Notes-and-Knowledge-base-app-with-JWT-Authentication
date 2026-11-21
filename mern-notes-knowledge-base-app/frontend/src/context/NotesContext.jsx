@@ -10,7 +10,8 @@ const DEFAULT_AVATAR =
 export function NotesProvider({ children }) {
   const { user: authUser, isAuthenticated } = useAuth();
 
-  const [notes, setNotes] = useState([]);
+  // All notes across all views fetched from backend (source of truth for client filtering & counts)
+  const [allNotesData, setAllNotesData] = useState([]);
   const [activeView, setActiveView] = useState('all'); // 'all' | 'pinned' | 'archived' | 'trash' | 'tags' | 'settings'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState(null);
@@ -86,12 +87,14 @@ export function NotesProvider({ children }) {
       });
   }, [isAuthenticated]);
 
-  // Global counts across all states
-  const [allNotesData, setAllNotesData] = useState([]);
-  const refreshGlobalCounts = useCallback(async () => {
+  // Fetch all notes from backend across workspaces
+  const loadNotes = useCallback(async () => {
     if (!isAuthenticated) return;
 
     try {
+      setLoading(true);
+      setError(null);
+
       const [allActive, archived, trash] = await Promise.all([
         notesApi.getNotes({ view: 'all' }),
         notesApi.getNotes({ view: 'archived' }),
@@ -103,55 +106,21 @@ export function NotesProvider({ children }) {
         ...(trash.data || []),
       ];
       setAllNotesData(combined);
-    } catch {
-      // Ignore background badge error
-    }
-  }, [isAuthenticated]);
-
-  // Fetch notes from backend
-  const loadNotes = useCallback(async () => {
-    if (!isAuthenticated) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Determine view param for backend
-      let backendView = 'all';
-      if (activeView === 'pinned') backendView = 'pinned';
-      if (activeView === 'archived') backendView = 'archived';
-      if (activeView === 'trash') backendView = 'trash';
-
-      const params = {
-        view: backendView,
-        sort,
-      };
-
-      if (searchQuery.trim()) {
-        params.search = searchQuery.trim();
-      }
-      if (selectedTag) {
-        params.tag = selectedTag;
-      }
-      if (selectedColor) {
-        params.color = selectedColor;
-      }
-
-      const res = await notesApi.getNotes(params);
-      setNotes(res.data || []);
     } catch (err) {
       setError(err.message || 'Failed to load notes');
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, activeView, searchQuery, selectedTag, selectedColor, sort]);
+  }, [isAuthenticated]);
+
+  // Backward-compatible alias for refreshing counts/data
+  const refreshGlobalCounts = loadNotes;
 
   // Only load notes when authenticated; clear state completely when logged out
   useEffect(() => {
     if (isAuthenticated) {
       loadNotes();
     } else {
-      setNotes([]);
       setAllNotesData([]);
       setActiveView('all');
       setSearchQuery('');
@@ -164,12 +133,98 @@ export function NotesProvider({ children }) {
     }
   }, [isAuthenticated, loadNotes]);
 
-  // Initial count load upon authentication (mutations refresh explicitly)
-  useEffect(() => {
-    if (isAuthenticated) {
-      refreshGlobalCounts();
+  // Filter state helpers
+  const clearFilters = useCallback(() => {
+    setSearchQuery('');
+    setSelectedTag(null);
+    setSelectedColor(null);
+  }, []);
+
+  const isFiltering = useMemo(
+    () => Boolean(searchQuery.trim() || selectedTag || selectedColor),
+    [searchQuery, selectedTag, selectedColor]
+  );
+
+  // Compute live filtered and sorted notes based on active workspace, search, tag, and color
+  const notes = useMemo(() => {
+    // 1. Current workspace / view filtering
+    let viewNotes = [];
+    if (activeView === 'pinned') {
+      viewNotes = allNotesData.filter(
+        (n) => !n.isTrash && !n.isDeleted && !n.isArchived && n.isPinned
+      );
+    } else if (activeView === 'archived') {
+      viewNotes = allNotesData.filter(
+        (n) => !n.isTrash && !n.isDeleted && n.isArchived
+      );
+    } else if (activeView === 'trash') {
+      viewNotes = allNotesData.filter(
+        (n) => n.isTrash || n.isDeleted
+      );
+    } else {
+      // Default / 'all' view: active notes that are not archived and not in trash
+      viewNotes = allNotesData.filter(
+        (n) => !n.isTrash && !n.isDeleted && !n.isArchived
+      );
     }
-  }, [isAuthenticated, refreshGlobalCounts]);
+
+    // 2. Global note search: title, content, or tags case-insensitively with sensible whitespace handling
+    const rawSearch = searchQuery.trim();
+    if (rawSearch) {
+      const q = rawSearch.toLowerCase().replace(/^#+/, '').replace(/\s+/g, ' ');
+      viewNotes = viewNotes.filter((n) => {
+        const title = (n.title || '').toLowerCase().replace(/\s+/g, ' ');
+        const content = (n.content || '').toLowerCase().replace(/\s+/g, ' ');
+        const tagMatch =
+          Array.isArray(n.tags) &&
+          n.tags.some((t) => t.toLowerCase().replace(/^#+/, '').includes(q));
+        return title.includes(q) || content.includes(q) || tagMatch;
+      });
+    }
+
+    // 3. Tag filtering: case-insensitive normalized tag matching
+    if (selectedTag) {
+      const normalizedTag = selectedTag.trim().toLowerCase().replace(/^#+/, '');
+      viewNotes = viewNotes.filter(
+        (n) =>
+          Array.isArray(n.tags) &&
+          n.tags.some(
+            (t) => t.trim().toLowerCase().replace(/^#+/, '') === normalizedTag
+          )
+      );
+    }
+
+    // 4. Color filtering: matches note color
+    if (selectedColor) {
+      viewNotes = viewNotes.filter((n) => {
+        const c = n.color || 'default';
+        return c === selectedColor;
+      });
+    }
+
+    // 5. Sorting
+    const sorted = [...viewNotes].sort((a, b) => {
+      if (sort === 'updated_asc') {
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateA - dateB;
+      }
+      if (sort === 'created_desc') {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return dateB - dateA;
+      }
+      if (sort === 'title_asc') {
+        return (a.title || '').localeCompare(b.title || '');
+      }
+      // Default: 'updated_desc'
+      const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+
+    return sorted;
+  }, [allNotesData, activeView, searchQuery, selectedTag, selectedColor, sort]);
 
   // Compute live counts
   const counts = useMemo(() => {
@@ -383,6 +438,9 @@ export function NotesProvider({ children }) {
         toast,
         counts,
         tagsSummary,
+        allNotesData,
+        isFiltering,
+        clearFilters,
         modalNote,
         setModalNote,
         deleteDialog,

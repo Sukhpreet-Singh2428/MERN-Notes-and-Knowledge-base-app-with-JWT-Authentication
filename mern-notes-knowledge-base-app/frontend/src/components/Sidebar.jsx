@@ -18,10 +18,6 @@ export default function Sidebar() {
 
   const handleNavClick = (view) => {
     setActiveView(view);
-    setSearchQuery('');
-    if (view !== 'tags') {
-      setSelectedTag(null);
-    }
     setIsMobileNavOpen(false);
   };
 

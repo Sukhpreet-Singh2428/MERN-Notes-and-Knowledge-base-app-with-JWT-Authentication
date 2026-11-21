@@ -24,14 +24,18 @@ export default function Header() {
       }
       if (e.key === 'Escape') {
         if (document.activeElement === searchInputRef.current) {
-          searchInputRef.current?.blur();
+          if (searchQuery) {
+            setSearchQuery('');
+          } else {
+            searchInputRef.current?.blur();
+          }
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [searchQuery, setSearchQuery]);
 
   return (
     <>
@@ -75,7 +79,7 @@ export default function Header() {
               onChange={(e) => {
                 const val = e.target.value;
                 setSearchQuery(val);
-                if (val.trim() && activeView !== 'all') {
+                if (val.trim() && (activeView === 'tags' || activeView === 'settings')) {
                   setActiveView('all');
                 }
               }}

@@ -1,10 +1,23 @@
 import React from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
 import NoteCard from '../components/NoteCard.jsx';
+import FilterBanner from '../components/FilterBanner.jsx';
 
 export default function ArchivedView() {
-  const { notes, counts, loading, error, viewMode, setViewMode, sort, setSort, openCreateModal } =
-    useNotes();
+  const {
+    notes,
+    counts,
+    loading,
+    error,
+    viewMode,
+    setViewMode,
+    sort,
+    setSort,
+    openCreateModal,
+    isFiltering,
+    clearFilters,
+    allNotesData,
+  } = useNotes();
 
   return (
     <div className="flex flex-col w-full pb-16">
@@ -101,8 +114,11 @@ export default function ArchivedView() {
         </div>
       </header>
 
+      {/* Active Search / Filter Banner if any */}
+      <FilterBanner />
+
       {/* Loading */}
-      {loading && (
+      {loading && allNotesData.length === 0 && (
         <div className="flex items-center justify-center py-20 text-on-surface-variant">
           <span className="material-symbols-outlined text-3xl animate-spin text-primary">
             progress_activity
@@ -120,30 +136,54 @@ export default function ArchivedView() {
       {!loading && !error && notes.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-md mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center text-tertiary mb-4 shadow-sm">
-            <span className="material-symbols-outlined text-3xl">archive</span>
+            <span className="material-symbols-outlined text-3xl">
+              {isFiltering ? 'search_off' : 'archive'}
+            </span>
           </div>
           <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">
-            Archive is empty
+            {isFiltering ? 'No matching archived notes' : 'Archive is empty'}
           </h3>
           <p className="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
-            Archive completed projects and older references to keep your main dashboard uncluttered while keeping full search accessibility.
+            {isFiltering
+              ? 'No archived notes match your current search or filters. Try adjusting your query or resetting filters.'
+              : 'Archive completed projects and older references to keep your main dashboard uncluttered while keeping full search accessibility.'}
           </p>
+          {isFiltering && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-lg">filter_alt_off</span>
+              <span>Reset Search & Filters</span>
+            </button>
+          )}
         </div>
       )}
 
       {/* Archive Grid / List */}
       {!loading && notes.length > 0 && (
-        <div
-          className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
-              : 'flex flex-col gap-space-sm'
-          }
-        >
-          {notes.map((note) => (
-            <NoteCard key={note.id} note={note} isListView={viewMode === 'list'} />
-          ))}
-        </div>
+        <section className="flex flex-col gap-space-md">
+          {isFiltering && (
+            <div className="flex items-center gap-space-xs pt-1">
+              <span className="material-symbols-outlined text-primary text-lg">search_check</span>
+              <h2 className="font-label-md text-label-md text-on-surface font-semibold tracking-wider uppercase">
+                Matching Archived Notes ({notes.length})
+              </h2>
+            </div>
+          )}
+          <div
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-space-md'
+                : 'flex flex-col gap-space-sm'
+            }
+          >
+            {notes.map((note) => (
+              <NoteCard key={note.id} note={note} isListView={viewMode === 'list'} />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
