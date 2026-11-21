@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
 
 export default function TagsView() {
-  const { tagsSummary, counts, setActiveView, setSelectedTag, openCreateModal } = useNotes();
+  const { tagsSummary, counts, setActiveView, setSelectedTag, openCreateModal, loading, error } =
+    useNotes();
   const [tagSearch, setTagSearch] = useState('');
   const [tagSort, setTagSort] = useState('count_desc');
 
@@ -131,8 +132,23 @@ export default function TagsView() {
         </div>
       </div>
 
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-20 text-on-surface-variant">
+          <span className="material-symbols-outlined text-3xl animate-spin text-primary">
+            progress_activity
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4">
+          Error loading tags: {error}
+        </div>
+      )}
+
       {/* Empty State */}
-      {filteredTags.length === 0 && (
+      {!loading && !error && filteredTags.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-md mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary mb-4 shadow-sm">
             <span className="material-symbols-outlined text-3xl">label_off</span>

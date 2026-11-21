@@ -19,22 +19,28 @@ export function NotesProvider({ children }) {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
 
   const [profile, setProfile] = useState(() => ({
-    displayName: authUser?.displayName || 'Elena Rostova',
-    bio: authUser?.bio || 'Writer & Botanical Researcher',
-    email: authUser?.email || 'elena.rostova@hearthnotes.local',
+    displayName: authUser?.displayName || '',
+    bio: authUser?.bio || '',
+    email: authUser?.email || '',
     avatarUrl: authUser?.avatarUrl || DEFAULT_AVATAR,
   }));
 
-  // Synchronize initial profile state with authenticated user
+  // Synchronize profile state with authenticated user lifecycle
   useEffect(() => {
     if (authUser) {
-      setProfile((prev) => ({
-        ...prev,
-        displayName: authUser.displayName || prev.displayName,
-        bio: authUser.bio !== undefined ? authUser.bio : prev.bio,
-        email: authUser.email || prev.email,
-        avatarUrl: authUser.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
-      }));
+      setProfile({
+        displayName: authUser.displayName || '',
+        bio: authUser.bio !== undefined ? authUser.bio : '',
+        email: authUser.email || '',
+        avatarUrl: authUser.avatarUrl || DEFAULT_AVATAR,
+      });
+    } else {
+      setProfile({
+        displayName: '',
+        bio: '',
+        email: '',
+        avatarUrl: DEFAULT_AVATAR,
+      });
     }
   }, [authUser]);
 
@@ -140,23 +146,30 @@ export function NotesProvider({ children }) {
     }
   }, [isAuthenticated, activeView, searchQuery, selectedTag, selectedColor, sort]);
 
-  // Only load notes when authenticated; clear state when logged out
+  // Only load notes when authenticated; clear state completely when logged out
   useEffect(() => {
     if (isAuthenticated) {
       loadNotes();
     } else {
       setNotes([]);
       setAllNotesData([]);
+      setActiveView('all');
+      setSearchQuery('');
+      setSelectedTag(null);
+      setSelectedColor(null);
+      setModalNote(null);
+      setDeleteDialog(null);
       setLoading(false);
       setError(null);
     }
   }, [isAuthenticated, loadNotes]);
 
+  // Initial count load upon authentication (mutations refresh explicitly)
   useEffect(() => {
     if (isAuthenticated) {
       refreshGlobalCounts();
     }
-  }, [isAuthenticated, notes, refreshGlobalCounts]);
+  }, [isAuthenticated, refreshGlobalCounts]);
 
   // Compute live counts
   const counts = useMemo(() => {
@@ -232,7 +245,8 @@ export function NotesProvider({ children }) {
 
   const updateNote = async (id, noteData) => {
     try {
-      const res = await notesApi.updateNote(id, noteData);
+      const targetId = id || (noteData && (noteData.id || noteData._id));
+      const res = await notesApi.updateNote(targetId, noteData);
       showToast('Note updated', 'success');
       setModalNote(null);
       await loadNotes();
@@ -306,7 +320,7 @@ export function NotesProvider({ children }) {
   const emptyTrash = async () => {
     try {
       const trashNotes = allNotesData.filter((n) => n.isTrash || n.isDeleted);
-      await Promise.all(trashNotes.map((n) => notesApi.permanentDelete(n.id)));
+      await Promise.all(trashNotes.map((n) => notesApi.permanentDelete(n.id || n._id)));
       showToast('Trash emptied permanently', 'info');
       setDeleteDialog(null);
       await loadNotes();
@@ -344,7 +358,7 @@ export function NotesProvider({ children }) {
   };
 
   const openEditModal = (note) => {
-    setModalNote({ ...note, isNew: false });
+    setModalNote({ ...note, isNew: false, id: note.id || note._id });
   };
 
   return (

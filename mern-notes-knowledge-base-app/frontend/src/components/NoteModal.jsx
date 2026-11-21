@@ -77,7 +77,7 @@ export default function NoteModal() {
       if (modalNote.isNew) {
         await createNote(payload);
       } else {
-        await updateNote(modalNote.id, payload);
+        await updateNote(modalNote.id || modalNote._id, payload);
       }
     } finally {
       setSaving(false);
@@ -317,7 +317,7 @@ export default function NoteModal() {
               <button
                 type="button"
                 onClick={() => {
-                  deleteNote(modalNote.id);
+                  deleteNote(modalNote.id || modalNote._id);
                   setModalNote(null);
                 }}
                 className="px-3 py-2 rounded-lg text-error hover:bg-error-container/40 font-label-md text-label-md transition-colors cursor-pointer"
