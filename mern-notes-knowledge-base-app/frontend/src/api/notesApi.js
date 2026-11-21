@@ -10,10 +10,28 @@ const client = axios.create({
   timeout: 10000,
 });
 
-// Response interceptor for consistent error extraction
+// Request interceptor to attach Authorization header when JWT exists
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('hearth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Response interceptor for consistent error extraction and 401 handling
 client.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    if (error.response?.status === 401) {
+      const url = error.config?.url || '';
+      // Only clear token and dispatch auth:logout for authenticated requests, not login attempts
+      if (!url.includes('/auth/login') && !url.includes('/auth/register')) {
+        localStorage.removeItem('hearth_token');
+        window.dispatchEvent(new Event('auth:logout'));
+      }
+    }
+
     const message =
       error.response?.data?.error?.message ||
       error.response?.data?.message ||
@@ -24,6 +42,12 @@ client.interceptors.response.use(
 );
 
 export const notesApi = {
+  /**
+   * Authentication endpoints
+   */
+  login: (data) => client.post('/auth/login', data),
+  register: (data) => client.post('/auth/register', data),
+
   /**
    * Fetch notes with optional filtering
    * @param {Object} params - { view, search, tag, color, dateFrom, dateTo, sort }

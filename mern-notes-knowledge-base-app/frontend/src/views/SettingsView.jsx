@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 
 export default function SettingsView() {
-  const { profile, updateAuthorProfile, showToast } = useNotes();
+  const { profile, updateAuthorProfile } = useNotes();
   const {
     theme,
     setTheme,
@@ -13,9 +13,15 @@ export default function SettingsView() {
     setDefaultColor,
   } = useTheme();
 
-  const [displayName, setDisplayName] = useState(profile.displayName || 'Elena Rostova');
-  const [bio, setBio] = useState(profile.bio || 'Writer & Botanical Researcher');
+  const [displayName, setDisplayName] = useState(profile.displayName || '');
+  const [bio, setBio] = useState(profile.bio || '');
   const [saving, setSaving] = useState(false);
+
+  // Sync inputs when profile loads or updates
+  useEffect(() => {
+    if (profile.displayName) setDisplayName(profile.displayName);
+    if (profile.bio !== undefined) setBio(profile.bio || '');
+  }, [profile.displayName, profile.bio]);
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
@@ -43,14 +49,14 @@ export default function SettingsView() {
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-tertiary/40"></span>
             <span className="font-caption text-caption text-on-surface-variant">
-              Version 1.0 (CE1 Evaluation)
+              Version 1.0 (Authenticated)
             </span>
           </div>
           <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight">
             Settings & Preferences
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-            Manage your personal profile, reading atmosphere, and system roadmap configurations.
+            Manage your personal profile, reading atmosphere, and workspace configurations.
           </p>
         </div>
       </div>
@@ -73,24 +79,26 @@ export default function SettingsView() {
             </p>
           </div>
 
-          {/* Avatar & Actions */}
+          {/* Avatar & Info */}
           <div className="p-5 rounded-xl bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-5">
               <div className="relative w-20 h-20 rounded-full overflow-hidden shadow-sm flex-shrink-0 ring-2 ring-surface">
                 <img
-                  alt={displayName}
+                  alt={displayName || 'User'}
                   className="w-full h-full object-cover"
                   src={profile.avatarUrl}
                 />
               </div>
               <div className="flex flex-col">
-                <span className="font-title-md text-title-md text-on-surface">{displayName}</span>
+                <span className="font-title-md text-title-md text-on-surface">
+                  {displayName || profile.displayName}
+                </span>
                 <span className="font-body-sm text-body-sm text-on-surface-variant">
-                  Author identifier #HRTH-8492
+                  {profile.email || 'Authenticated Researcher'}
                 </span>
                 <span className="font-caption text-caption text-primary flex items-center gap-1 mt-1">
                   <span className="material-symbols-outlined text-sm">verified</span>
-                  Verified Researcher
+                  Authenticated User
                 </span>
               </div>
             </div>
@@ -137,7 +145,7 @@ export default function SettingsView() {
               >
                 <span>Primary Email</span>
                 <span className="font-caption text-caption text-on-surface-variant flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm">lock</span> Read-only in local profile
+                  <span className="material-symbols-outlined text-sm">lock</span> Read-only in profile settings
                 </span>
               </label>
               <div className="relative flex items-center">
@@ -145,7 +153,7 @@ export default function SettingsView() {
                   id="email-address"
                   readOnly
                   type="email"
-                  value={profile.email || 'elena.rostova@hearthnotes.local'}
+                  value={profile.email || ''}
                   className="w-full px-4 py-2.5 bg-surface-container/60 cursor-not-allowed rounded-lg font-body-md text-body-md text-on-surface-variant/80 focus:outline-none"
                 />
                 <span className="material-symbols-outlined text-base absolute right-3 text-outline">
@@ -373,29 +381,29 @@ export default function SettingsView() {
         {/* Visual Divider */}
         <div className="h-1.5 w-full bg-surface-container-low rounded-full"></div>
 
-        {/* Section 3: Account Security (Academic CE2 Roadmap Callout) */}
+        {/* Section 3: Account Security */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="font-headline-sm text-headline-sm text-on-surface">
               Security & Storage Architecture
             </h2>
             <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Current state and verified technical milestones for authentication and record durability.
+              Active authentication system and verified technical specifications for account security.
             </p>
           </div>
 
-          {/* Refined Informational Roadmap Callout Card */}
+          {/* Active Security Information Card */}
           <div className="p-6 md:p-7 rounded-xl bg-surface-container-low relative overflow-hidden flex flex-col gap-4 border border-surface-container">
             <span className="material-symbols-outlined absolute -right-6 -bottom-6 text-primary/5 text-9xl pointer-events-none select-none">
               shield
             </span>
             <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-caption text-caption uppercase tracking-wider font-semibold">
-                <span className="material-symbols-outlined text-sm">flag</span>
-                Academic Project Roadmap • CE2 Planned
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-caption text-caption uppercase tracking-wider font-semibold">
+                <span className="material-symbols-outlined text-sm">verified_user</span>
+                Active Security • JWT Authentication
               </span>
               <span className="font-caption text-caption text-on-surface-variant">
-                Active Architecture: Single-User CE1 (File System JSON)
+                Active Architecture: Multi-User MongoDB + JWT
               </span>
             </div>
 
@@ -405,35 +413,25 @@ export default function SettingsView() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <h3 className="font-title-lg text-title-lg text-on-surface">
-                  JWT Authentication & Secure Password Management
+                  JWT Authentication & Protected User Isolation
                 </h3>
                 <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  Real MongoDB user isolation, encrypted password hashing (<code className="font-mono text-body-sm bg-surface-container px-1.5 py-0.5 rounded text-primary">bcrypt</code>), and JSON Web Token (<code className="font-mono text-body-sm bg-surface-container px-1.5 py-0.5 rounded text-primary">JWT</code>) session issuance are scheduled for the next development sprint. In this CE1 prototype, durable local state with JSON file persistence is active.
+                  Real MongoDB user isolation, encrypted password hashing (<code className="font-mono text-body-sm bg-surface-container px-1.5 py-0.5 rounded text-primary">bcrypt</code>), and JSON Web Token (<code className="font-mono text-body-sm bg-surface-container px-1.5 py-0.5 rounded text-primary">JWT</code>) session issuance are active. Each note and profile is securely tied to your authenticated account.
                 </p>
               </div>
             </div>
 
-            {/* Disabled Placeholder for CE2 */}
             <div className="mt-2 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10 border-t border-surface-container-high/60">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-outline text-lg">lock_clock</span>
+                <span className="material-symbols-outlined text-primary text-lg">lock</span>
                 <span className="font-body-sm text-body-sm text-on-surface-variant">
-                  Password rotation & cryptographic token revoking
+                  Signed in as <strong className="text-on-surface">{profile.email}</strong>
                 </span>
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  disabled
-                  className="px-4 py-2 rounded-lg bg-surface-container-high text-outline cursor-not-allowed font-label-md text-label-md flex items-center gap-1.5"
-                >
-                  <span className="material-symbols-outlined text-base">key_off</span>
-                  <span>Update Password</span>
-                </button>
-                <span className="font-caption text-caption text-outline italic">
-                  (Available upon CE2 deployment)
-                </span>
-              </div>
+              <span className="font-caption text-caption text-primary flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">check_circle</span>
+                Session Authenticated
+              </span>
             </div>
           </div>
         </section>
