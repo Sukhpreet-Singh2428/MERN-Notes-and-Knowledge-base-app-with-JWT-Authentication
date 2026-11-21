@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
 import NoteCard from '../components/NoteCard.jsx';
+import FilterBanner from '../components/FilterBanner.jsx';
 import { NOTE_COLORS } from '../utils/formatDate.js';
 
 export default function AllNotesView() {
@@ -21,9 +22,9 @@ export default function AllNotesView() {
     searchQuery,
     setSearchQuery,
     tagsSummary,
+    isFiltering,
+    clearFilters,
   } = useNotes();
-
-  const isFiltering = Boolean(searchQuery || selectedTag || selectedColor);
 
   // Separate pinned and unpinned notes when viewing default unfiltered library
   const pinnedNotes = notes.filter((n) => n.isPinned);
@@ -196,40 +197,7 @@ export default function AllNotesView() {
       </section>
 
       {/* Active Search / Filter Banner if any */}
-      {isFiltering && (
-        <div className="flex items-center justify-between gap-2 p-3 mb-space-md rounded-xl bg-primary-fixed/40 text-primary font-body-sm text-body-sm">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="material-symbols-outlined text-base">filter_alt</span>
-            <span>Filtering by:</span>
-            {searchQuery && (
-              <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-medium">
-                Search: “{searchQuery}”
-              </span>
-            )}
-            {selectedTag && (
-              <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-medium">
-                Tag: #{selectedTag}
-              </span>
-            )}
-            {selectedColor && (
-              <span className="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-medium">
-                Color: {NOTE_COLORS[selectedColor]?.name || selectedColor}
-              </span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchQuery('');
-              setSelectedTag(null);
-              setSelectedColor(null);
-            }}
-            className="text-xs uppercase font-semibold hover:underline text-primary cursor-pointer shrink-0"
-          >
-            Clear Filters
-          </button>
-        </div>
-      )}
+      <FilterBanner />
 
       {/* Loading & Error States */}
       {loading && notes.length === 0 && (
@@ -251,10 +219,12 @@ export default function AllNotesView() {
       {!loading && !error && notes.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-md mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary mb-4 shadow-sm">
-            <span className="material-symbols-outlined text-3xl">note_add</span>
+            <span className="material-symbols-outlined text-3xl">
+              {isFiltering ? 'search_off' : 'note_add'}
+            </span>
           </div>
           <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">
-            No notes found
+            {isFiltering ? 'No matching notes' : 'No notes found'}
           </h3>
           <p className="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
             {isFiltering
@@ -264,11 +234,7 @@ export default function AllNotesView() {
           {isFiltering ? (
             <button
               type="button"
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedTag(null);
-                setSelectedColor(null);
-              }}
+              onClick={clearFilters}
               className="px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors shadow-sm flex items-center gap-2 cursor-pointer"
             >
               <span className="material-symbols-outlined text-lg">filter_alt_off</span>
