@@ -13,7 +13,7 @@ export default function DeleteModal() {
     if (isEmptyTrash) {
       emptyTrash();
     } else if (note) {
-      permanentDelete(note.id);
+      permanentDelete(note.id || note._id);
     }
   };
 

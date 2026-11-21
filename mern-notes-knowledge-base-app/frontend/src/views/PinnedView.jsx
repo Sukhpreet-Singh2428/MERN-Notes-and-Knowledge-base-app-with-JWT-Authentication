@@ -3,7 +3,7 @@ import { useNotes } from '../context/NotesContext.jsx';
 import NoteCard from '../components/NoteCard.jsx';
 
 export default function PinnedView() {
-  const { notes, counts, loading, viewMode, setViewMode, sort, setSort, openCreateModal } =
+  const { notes, counts, loading, error, viewMode, setViewMode, sort, setSort, openCreateModal } =
     useNotes();
 
   return (
@@ -83,8 +83,14 @@ export default function PinnedView() {
         </div>
       )}
 
+      {error && (
+        <div className="p-4 rounded-xl bg-error-container text-error font-body-sm text-body-sm mb-4">
+          Error loading notes: {error}
+        </div>
+      )}
+
       {/* Empty State */}
-      {!loading && notes.length === 0 && (
+      {!loading && !error && notes.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-md mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-secondary-fixed/40 flex items-center justify-center text-secondary mb-4 shadow-sm">
             <span className="material-symbols-outlined text-3xl material-symbols-filled">

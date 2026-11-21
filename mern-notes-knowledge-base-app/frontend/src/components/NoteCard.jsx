@@ -67,7 +67,7 @@ export default function NoteCard({ note, isListView = false }) {
           <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
             {!isTrash && (
               <button
-                onClick={() => togglePin(note.id)}
+                onClick={() => togglePin(note.id || note._id)}
                 className={`p-1 rounded transition-colors ${
                   note.isPinned
                     ? 'text-secondary'
@@ -120,7 +120,7 @@ export default function NoteCard({ note, isListView = false }) {
                         <button
                           onClick={() => {
                             setMenuOpen(false);
-                            togglePin(note.id);
+                            togglePin(note.id || note._id);
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
                         >
@@ -130,7 +130,7 @@ export default function NoteCard({ note, isListView = false }) {
                         <button
                           onClick={() => {
                             setMenuOpen(false);
-                            toggleArchive(note.id);
+                            toggleArchive(note.id || note._id);
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
                         >
@@ -141,7 +141,7 @@ export default function NoteCard({ note, isListView = false }) {
                         <button
                           onClick={() => {
                             setMenuOpen(false);
-                            deleteNote(note.id);
+                            deleteNote(note.id || note._id);
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-error hover:bg-error-container/40 font-body-sm text-body-sm transition-colors cursor-pointer"
                         >
@@ -154,7 +154,7 @@ export default function NoteCard({ note, isListView = false }) {
                         <button
                           onClick={() => {
                             setMenuOpen(false);
-                            restoreNote(note.id);
+                            restoreNote(note.id || note._id);
                           }}
                           className="w-full flex items-center gap-2 px-3 py-2 text-primary hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
                         >
@@ -242,7 +242,7 @@ export default function NoteCard({ note, isListView = false }) {
           >
             <button
               type="button"
-              onClick={() => restoreNote(note.id)}
+              onClick={() => restoreNote(note.id || note._id)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-primary bg-primary-fixed/40 hover:bg-primary-fixed transition-colors font-label-sm text-label-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-sm">settings_backup_restore</span>

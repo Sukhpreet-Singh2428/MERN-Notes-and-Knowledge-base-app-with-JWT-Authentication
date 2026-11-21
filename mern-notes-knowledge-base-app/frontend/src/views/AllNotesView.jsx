@@ -248,7 +248,7 @@ export default function AllNotesView() {
       )}
 
       {/* Empty State */}
-      {!loading && notes.length === 0 && (
+      {!loading && !error && notes.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center max-w-md mx-auto">
           <div className="w-16 h-16 rounded-2xl bg-surface-container-low flex items-center justify-center text-primary mb-4 shadow-sm">
             <span className="material-symbols-outlined text-3xl">note_add</span>
