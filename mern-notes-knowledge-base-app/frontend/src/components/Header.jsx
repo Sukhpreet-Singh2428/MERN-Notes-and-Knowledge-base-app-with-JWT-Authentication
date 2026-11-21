@@ -84,13 +84,16 @@ export default function Header() {
                 }
               }}
               placeholder="Search notes, tags, ideas..."
+              aria-label="Search notes"
               className="w-full pl-9 sm:pl-10 pr-10 sm:pr-24 py-2 bg-surface-container-lowest rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant/60 outline-none focus:ring-1 focus:ring-primary shadow-sm border border-surface-container/60 transition-all"
             />
             {searchQuery ? (
               <button
+                type="button"
                 onClick={() => setSearchQuery('')}
                 className="absolute right-2.5 p-0.5 rounded text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                 title="Clear search"
+                aria-label="Clear search"
               >
                 <span className="material-symbols-outlined text-sm">close</span>
               </button>
