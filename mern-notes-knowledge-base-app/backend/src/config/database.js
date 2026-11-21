@@ -10,15 +10,25 @@ import mongoose from 'mongoose';
  *
  * @returns {Promise<typeof mongoose>} The Mongoose instance once connected.
  */
+let mongoMemoryServerInstance = null;
+
 export async function connectDatabase() {
-  const uri = process.env.MONGO_URI;
+  let uri = process.env.MONGO_URI;
 
   if (!uri) {
-    throw new Error(
-      'MONGO_URI is not defined. ' +
-      'Please set MONGO_URI in your .env file. ' +
-      'Example: MONGO_URI=mongodb+srv://<user>:<password>@cluster0.gnf3nnr.mongodb.net/hearth_notes?retryWrites=true&w=majority'
-    );
+    console.log('  ℹ️  No MONGO_URI provided in environment. Initializing local in-memory MongoDB...');
+    try {
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      mongoMemoryServerInstance = await MongoMemoryServer.create();
+      uri = mongoMemoryServerInstance.getUri();
+      console.log(`  📦 In-memory MongoDB ready.`);
+    } catch (e) {
+      throw new Error(
+        'MONGO_URI is not defined and in-memory MongoDB failed to start. ' +
+        'Please set MONGO_URI in your .env file. ' +
+        'Example: MONGO_URI=mongodb+srv://<user>:<password>@cluster0.gnf3nnr.mongodb.net/hearth_notes?retryWrites=true&w=majority'
+      );
+    }
   }
 
   // ── Mongoose connection event listeners ────────────────────────────
@@ -51,6 +61,10 @@ export async function connectDatabase() {
 export async function disconnectDatabase() {
   try {
     await mongoose.disconnect();
+    if (mongoMemoryServerInstance) {
+      await mongoMemoryServerInstance.stop();
+      mongoMemoryServerInstance = null;
+    }
     console.log('  🔌 MongoDB connection closed gracefully.');
   } catch (err) {
     console.error('  ❌ Error closing MongoDB connection:', err.message);
