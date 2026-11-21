@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useNotes } from '../context/NotesContext.jsx';
+import { useNotes, DEFAULT_AVATAR } from '../context/NotesContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 
 export default function Header() {
@@ -137,8 +137,11 @@ export default function Header() {
           >
             <img
               alt={profile.displayName || 'Author'}
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20 hover:ring-primary-container transition-all"
-              src={profile.avatarUrl}
+              className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-container/20 hover:ring-primary-container transition-all bg-surface-container"
+              src={profile.avatarUrl || DEFAULT_AVATAR}
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
             />
             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-surface"></span>
           </div>
@@ -183,9 +186,9 @@ export default function Header() {
               </div>
 
               <div className="bg-surface-container-low p-3 rounded-xl space-y-1">
-                <div className="text-xs uppercase font-semibold text-tertiary">CE1 Architecture</div>
+                <div className="text-xs uppercase font-semibold text-tertiary">MERN Architecture</div>
                 <p className="text-xs">
-                  Full Stack React + Express running with durable File System JSON persistence, color whitelisting, and tag classification.
+                  Full Stack MongoDB, Express, React, and Node.js with JWT authentication, user isolation, and notes workspace management.
                 </p>
               </div>
             </div>

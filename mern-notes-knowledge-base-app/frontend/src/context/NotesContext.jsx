@@ -4,11 +4,11 @@ import { useAuth } from './AuthContext.jsx';
 
 const NotesContext = createContext();
 
-const DEFAULT_AVATAR =
+export const DEFAULT_AVATAR =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBzu77tUsTobDgPKPcxam-Jtqr4Fu8NI1cTkdcoLdWdQu4iOafb1bLOSdD2DT3Qpea3as5Qjhgv-L5ZdghXwY-iz8hTTt9GzMVkCdqD-ZYj9JyFIcV5Z2qW4hJJ0_x0U5hdldOjehtgUiVfd8tS8nE6qYFywwwFmbYzp9zMerxJNHLzUX0r5g8eXqavwE1Q0giuhAtn8bnLOjtv5kwrfoVfKS06pikJ5coQhrKKRn5GSQkUL6rGQpal';
 
 export function NotesProvider({ children }) {
-  const { user: authUser, isAuthenticated } = useAuth();
+  const { user: authUser, isAuthenticated, updateUser: updateAuthUser } = useAuth();
 
   // All notes across all views fetched from backend (source of truth for client filtering & counts)
   const [allNotesData, setAllNotesData] = useState([]);
@@ -80,12 +80,15 @@ export function NotesProvider({ children }) {
             ...res.data,
             avatarUrl: res.data.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
           }));
+          if (updateAuthUser) {
+            updateAuthUser(res.data);
+          }
         }
       })
       .catch((err) => {
         console.warn('Profile fetch warning:', err.message);
       });
-  }, [isAuthenticated]);
+  }, [isAuthenticated, updateAuthUser]);
 
   // Fetch all notes from backend across workspaces
   const loadNotes = useCallback(async () => {
@@ -388,13 +391,17 @@ export function NotesProvider({ children }) {
   const updateAuthorProfile = async (profileData) => {
     try {
       const res = await notesApi.updateProfile(profileData);
+      const updatedData = res.data;
       setProfile((prev) => ({
         ...prev,
-        ...res.data,
-        avatarUrl: res.data?.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
+        ...updatedData,
+        avatarUrl: updatedData?.avatarUrl || prev.avatarUrl || DEFAULT_AVATAR,
       }));
+      if (updateAuthUser) {
+        updateAuthUser(updatedData);
+      }
       showToast('Preferences saved successfully', 'success');
-      return res.data;
+      return updatedData;
     } catch (err) {
       showToast(err.message, 'error');
       throw err;

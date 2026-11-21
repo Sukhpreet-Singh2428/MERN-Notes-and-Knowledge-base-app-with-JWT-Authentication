@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNotes } from '../context/NotesContext.jsx';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNotes, DEFAULT_AVATAR } from '../context/NotesContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function SettingsView() {
   const { profile, updateAuthorProfile } = useNotes();
+  const { logout } = useAuth();
   const {
     theme,
     setTheme,
@@ -15,28 +17,104 @@ export default function SettingsView() {
 
   const [displayName, setDisplayName] = useState(profile.displayName || '');
   const [bio, setBio] = useState(profile.bio || '');
+  const [avatarUrl, setAvatarUrl] = useState(
+    profile.avatarUrl === DEFAULT_AVATAR ? '' : profile.avatarUrl || ''
+  );
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState(null);
 
   // Sync inputs when profile loads or updates
   useEffect(() => {
-    if (profile.displayName) setDisplayName(profile.displayName);
-    if (profile.bio !== undefined) setBio(profile.bio || '');
-  }, [profile.displayName, profile.bio]);
+    setDisplayName(profile.displayName || '');
+    setBio(profile.bio || '');
+    setAvatarUrl(
+      profile.avatarUrl === DEFAULT_AVATAR ? '' : profile.avatarUrl || ''
+    );
+    setFormError(null);
+  }, [profile.displayName, profile.bio, profile.avatarUrl]);
+
+  const savedAvatar =
+    profile.avatarUrl === DEFAULT_AVATAR ? '' : profile.avatarUrl || '';
+
+  const isDirty = useMemo(() => {
+    const nameChanged = displayName.trim() !== (profile.displayName || '').trim();
+    const bioChanged = bio.trim() !== (profile.bio || '').trim();
+    const avatarChanged = avatarUrl.trim() !== savedAvatar.trim();
+    const themeChanged =
+      (theme === 'light' || theme === 'dark') &&
+      theme !== (profile.theme || 'light');
+    return nameChanged || bioChanged || avatarChanged || themeChanged;
+  }, [displayName, bio, avatarUrl, theme, profile, savedAvatar]);
+
+  const handleCancel = () => {
+    setDisplayName(profile.displayName || '');
+    setBio(profile.bio || '');
+    setAvatarUrl(savedAvatar);
+    setFormError(null);
+    if (
+      profile.theme &&
+      (profile.theme === 'light' || profile.theme === 'dark') &&
+      theme !== profile.theme
+    ) {
+      setTheme(profile.theme);
+    }
+  };
 
   const handleSaveProfile = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (saving) return;
+
+    const trimmedName = displayName.trim();
+    if (!trimmedName) {
+      setFormError('Display name is required.');
+      return;
+    }
+    if (trimmedName.length > 100) {
+      setFormError('Display name must be 100 characters or fewer.');
+      return;
+    }
+
+    const trimmedBio = bio.trim();
+    if (trimmedBio.length > 200) {
+      setFormError('Bio must be 200 characters or fewer.');
+      return;
+    }
+
+    const trimmedAvatar = avatarUrl.trim();
+    if (trimmedAvatar && trimmedAvatar.length > 500) {
+      setFormError('Avatar URL must be 500 characters or fewer.');
+      return;
+    }
+    if (trimmedAvatar && /^\s*javascript:/i.test(trimmedAvatar)) {
+      setFormError('Please enter a valid HTTP or HTTPS image URL.');
+      return;
+    }
+
     try {
       setSaving(true);
-      await updateAuthorProfile({
-        displayName: displayName.trim(),
-        bio: bio.trim(),
-      });
-    } catch {
-      // toast shown in context
+      setFormError(null);
+
+      const payload = {
+        displayName: trimmedName,
+        bio: trimmedBio,
+        avatarUrl: trimmedAvatar,
+      };
+
+      if (theme === 'light' || theme === 'dark') {
+        payload.theme = theme;
+      }
+
+      await updateAuthorProfile(payload);
+    } catch (err) {
+      // Retain user draft values on failure, display clear error message
+      setFormError(err.message || 'Failed to save profile preferences.');
     } finally {
       setSaving(false);
     }
   };
+
+  const previewAvatarSrc =
+    avatarUrl.trim() || profile.avatarUrl || DEFAULT_AVATAR;
 
   return (
     <div className="flex flex-col w-full pb-16">
@@ -79,19 +157,38 @@ export default function SettingsView() {
             </p>
           </div>
 
-          {/* Avatar & Info */}
+          {/* Validation Error Banner */}
+          {formError && (
+            <div
+              role="alert"
+              className="p-4 rounded-xl bg-error/10 border border-error/20 text-error flex items-start gap-3 text-body-sm font-medium animate-in fade-in"
+            >
+              <span className="material-symbols-outlined text-xl flex-shrink-0 mt-0.5">
+                error
+              </span>
+              <div className="flex flex-col">
+                <span className="font-semibold">Unable to Save</span>
+                <span>{formError}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Avatar & Info Preview */}
           <div className="p-5 rounded-xl bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-5">
-              <div className="relative w-20 h-20 rounded-full overflow-hidden shadow-sm flex-shrink-0 ring-2 ring-surface">
+              <div className="relative w-20 h-20 rounded-full overflow-hidden shadow-sm flex-shrink-0 ring-2 ring-surface bg-surface-container">
                 <img
-                  alt={displayName || 'User'}
+                  alt={displayName || profile.displayName || 'User'}
                   className="w-full h-full object-cover"
-                  src={profile.avatarUrl}
+                  src={previewAvatarSrc}
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_AVATAR;
+                  }}
                 />
               </div>
               <div className="flex flex-col">
                 <span className="font-title-md text-title-md text-on-surface">
-                  {displayName || profile.displayName}
+                  {displayName || profile.displayName || 'Author'}
                 </span>
                 <span className="font-body-sm text-body-sm text-on-surface-variant">
                   {profile.email || 'Authenticated Researcher'}
@@ -107,15 +204,26 @@ export default function SettingsView() {
           {/* Profile Form Fields */}
           <form onSubmit={handleSaveProfile} className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface" htmlFor="display-name">
-                Display Name
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="font-label-md text-label-md text-on-surface" htmlFor="display-name">
+                  Display Name <span className="text-error">*</span>
+                </label>
+                <span className="font-caption text-caption text-on-surface-variant">
+                  {displayName.length}/100
+                </span>
+              </div>
               <input
                 id="display-name"
                 type="text"
+                maxLength={100}
+                required
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={(e) => {
+                  setDisplayName(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 className="w-full px-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container transition-all"
+                placeholder="e.g., Ada Lovelace"
               />
               <span className="font-caption text-caption text-on-surface-variant">
                 Appears at the header of all notebooks.
@@ -123,22 +231,58 @@ export default function SettingsView() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="font-label-md text-label-md text-on-surface" htmlFor="workspace-role">
-                Bio / Workspace Role
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="font-label-md text-label-md text-on-surface" htmlFor="avatar-url">
+                  Avatar Image URL
+                </label>
+                <span className="font-caption text-caption text-on-surface-variant">
+                  Optional
+                </span>
+              </div>
+              <input
+                id="avatar-url"
+                type="url"
+                maxLength={500}
+                value={avatarUrl}
+                onChange={(e) => {
+                  setAvatarUrl(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                placeholder="https://example.com/avatar.jpg"
+                className="w-full px-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container transition-all"
+              />
+              <span className="font-caption text-caption text-on-surface-variant">
+                Public image URL. Leave empty to use default avatar.
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <label className="font-label-md text-label-md text-on-surface" htmlFor="workspace-role">
+                  Bio / Workspace Role
+                </label>
+                <span className="font-caption text-caption text-on-surface-variant">
+                  {bio.length}/200
+                </span>
+              </div>
               <input
                 id="workspace-role"
                 type="text"
+                maxLength={200}
                 value={bio}
-                onChange={(e) => setBio(e.target.value)}
+                onChange={(e) => {
+                  setBio(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 className="w-full px-4 py-2.5 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container transition-all"
+                placeholder="e.g., Researcher & Knowledge Curator"
               />
               <span className="font-caption text-caption text-on-surface-variant">
                 Short descriptive subtitle for your research repository.
               </span>
             </div>
 
-            <div className="flex flex-col gap-2 md:col-span-2">
+            <div className="flex flex-col gap-2">
               <label
                 className="font-label-md text-label-md text-on-surface flex items-center justify-between"
                 htmlFor="email-address"
@@ -155,11 +299,15 @@ export default function SettingsView() {
                   type="email"
                   value={profile.email || ''}
                   className="w-full px-4 py-2.5 bg-surface-container/60 cursor-not-allowed rounded-lg font-body-md text-body-md text-on-surface-variant/80 focus:outline-none"
+                  aria-readonly="true"
                 />
                 <span className="material-symbols-outlined text-base absolute right-3 text-outline">
                   verified_user
                 </span>
               </div>
+              <span className="font-caption text-caption text-on-surface-variant">
+                Account identity used for login and user isolation.
+              </span>
             </div>
           </form>
         </section>
@@ -428,10 +576,21 @@ export default function SettingsView() {
                   Signed in as <strong className="text-on-surface">{profile.email}</strong>
                 </span>
               </div>
-              <span className="font-caption text-caption text-primary flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">check_circle</span>
-                Session Authenticated
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="font-caption text-caption text-primary flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">check_circle</span>
+                  Session Authenticated
+                </span>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="px-3.5 py-1.5 rounded-lg bg-surface-container hover:bg-error/10 hover:text-error text-on-surface font-label-md text-body-sm transition-colors flex items-center gap-1.5 cursor-pointer ml-2"
+                  title="Sign out of your session"
+                >
+                  <span className="material-symbols-outlined text-base">logout</span>
+                  <span>Sign Out</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -439,21 +598,45 @@ export default function SettingsView() {
         {/* Bottom Action Footer */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-surface-container">
           <div className="flex items-center gap-2 text-on-surface-variant">
-            <span className="material-symbols-outlined text-primary text-base">cloud_done</span>
+            <span className="material-symbols-outlined text-primary text-base">
+              {isDirty ? 'edit_note' : 'cloud_done'}
+            </span>
             <span className="font-caption text-caption">
-              Changes persisted to backend repository
+              {isDirty
+                ? 'You have unsaved changes in your preferences'
+                : 'Changes persisted to backend repository'}
             </span>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
             <button
               type="button"
-              onClick={handleSaveProfile}
-              disabled={saving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-label-md text-label-md transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              onClick={handleCancel}
+              disabled={!isDirty || saving}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-surface-container hover:bg-surface-container font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-lg">check</span>
-              <span>{saving ? 'Saving...' : 'Save Preferences'}</span>
+              Reset Changes
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveProfile}
+              disabled={saving || (!isDirty && !formError)}
+              className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-primary-container text-on-primary hover:bg-primary font-label-md text-label-md transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? (
+                <>
+                  <span className="material-symbols-outlined text-lg animate-spin">
+                    progress_activity
+                  </span>
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-lg">check</span>
+                  <span>Save Preferences</span>
+                </>
+              )}
             </button>
           </div>
         </div>
