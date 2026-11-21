@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNotes } from '../context/NotesContext.jsx';
 import { formatRelativeDate, getDaysRemainingInTrash, NOTE_COLORS } from '../utils/formatDate.js';
 
@@ -15,14 +15,24 @@ export default function NoteCard({ note, isListView = false }) {
   } = useNotes();
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (!menuOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') setMenuOpen(false);
     };
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [menuOpen]);
 
   const colorMeta = NOTE_COLORS[note.color] || NOTE_COLORS.default;
@@ -56,13 +66,15 @@ export default function NoteCard({ note, isListView = false }) {
           }
         }
       }}
-      className={`group relative flex flex-col justify-between bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 border border-surface-container cursor-pointer overflow-hidden ${
+      className={`group relative flex flex-col justify-between bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 border border-surface-container cursor-pointer ${
+        menuOpen ? 'z-30' : 'hover:z-10'
+      } ${
         isListView ? 'p-space-md sm:flex-row sm:items-center gap-space-md' : 'p-space-md'
       }`}
     >
       {/* Left Colored Accent Strip */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors"
+        className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl transition-colors pointer-events-none"
         style={{ backgroundColor: `var(--note-accent-${note.color || 'default'}, ${colorMeta.accent})` }}
       ></div>
 
@@ -120,7 +132,7 @@ export default function NoteCard({ note, isListView = false }) {
             )}
 
             {/* Menu Trigger */}
-            <div className="relative">
+            <div className="relative" ref={menuRef}>
               <button
                 type="button"
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -134,89 +146,89 @@ export default function NoteCard({ note, isListView = false }) {
               </button>
 
               {menuOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setMenuOpen(false)}
-                  ></div>
-                  <div
-                    className="absolute right-0 top-full mt-1 w-48 bg-surface-container-lowest rounded-xl shadow-lg border border-surface-container py-1.5 z-50 animate-in fade-in select-none text-left"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {!isTrash ? (
-                      <>
-                        <button
-                          onClick={() => {
-                            setMenuOpen(false);
-                            openEditModal(note);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-base">edit</span>
-                          <span>Edit Note</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setMenuOpen(false);
-                            togglePin(note.id || note._id);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-base">push_pin</span>
-                          <span>{note.isPinned ? 'Unpin' : 'Pin to top'}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setMenuOpen(false);
-                            toggleArchive(note.id || note._id);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-base">archive</span>
-                          <span>{isArchived ? 'Unarchive' : 'Archive'}</span>
-                        </button>
-                        <div className="h-px bg-surface-container my-1"></div>
-                        <button
-                          onClick={() => {
-                            setMenuOpen(false);
-                            deleteNote(note.id || note._id);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-error hover:bg-error-container/40 font-body-sm text-body-sm transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-base">delete</span>
-                          <span>Move to Trash</span>
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => {
-                            setMenuOpen(false);
-                            restoreNote(note.id || note._id);
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-primary hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-base">
-                            settings_backup_restore
-                          </span>
-                          <span>Restore Note</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setMenuOpen(false);
-                            setDeleteDialog({ note, type: 'permanent' });
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-error hover:bg-error-container/40 font-body-sm text-body-sm transition-colors cursor-pointer"
-                        >
-                          <span className="material-symbols-outlined text-base">
-                            delete_forever
-                          </span>
-                          <span>Delete Permanently</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </>
+                <div
+                  className="absolute right-0 top-full mt-1.5 w-52 bg-surface-container-lowest rounded-xl shadow-xl border border-surface-container py-1.5 z-50 animate-in fade-in select-none text-left"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {!isTrash ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          openEditModal(note);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-base">edit</span>
+                        <span>Edit Note</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          togglePin(note.id || note._id);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-base">push_pin</span>
+                        <span>{note.isPinned ? 'Unpin' : 'Pin to top'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          toggleArchive(note.id || note._id);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-on-surface hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-base">archive</span>
+                        <span>{isArchived ? 'Unarchive' : 'Archive'}</span>
+                      </button>
+                      <div className="h-px bg-surface-container my-1"></div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          deleteNote(note.id || note._id);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-error hover:bg-error-container/40 font-body-sm text-body-sm transition-colors cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-base">delete</span>
+                        <span>Delete Note</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          restoreNote(note.id || note._id);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-primary hover:bg-surface-container font-body-sm text-body-sm transition-colors cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-base">
+                          settings_backup_restore
+                        </span>
+                        <span>Restore Note</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setDeleteDialog({ note, type: 'permanent' });
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2 text-error hover:bg-error-container/40 font-body-sm text-body-sm transition-colors cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-base">
+                          delete_forever
+                        </span>
+                        <span>Delete Permanently</span>
+                      </button>
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </div>
