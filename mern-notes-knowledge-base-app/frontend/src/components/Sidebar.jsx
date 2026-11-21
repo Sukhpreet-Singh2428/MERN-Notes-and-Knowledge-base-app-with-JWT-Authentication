@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNotes } from '../context/NotesContext.jsx';
+import { useNotes, DEFAULT_AVATAR } from '../context/NotesContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Sidebar() {
@@ -172,8 +172,11 @@ export default function Sidebar() {
           >
             <img
               alt={profile.displayName || 'Profile'}
-              className="w-8 h-8 rounded-full object-cover"
-              src={profile.avatarUrl}
+              className="w-8 h-8 rounded-full object-cover bg-surface-container"
+              src={profile.avatarUrl || DEFAULT_AVATAR}
+              onError={(e) => {
+                e.currentTarget.src = DEFAULT_AVATAR;
+              }}
             />
             <div className="flex flex-col min-w-0">
               <span className="font-label-md text-label-md text-on-surface truncate">

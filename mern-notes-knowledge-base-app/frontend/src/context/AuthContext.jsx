@@ -14,6 +14,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((updatedData) => {
+    setUser((prev) => (prev ? { ...prev, ...updatedData } : updatedData));
+  }, []);
+
   // Restore authentication state on mount or validate stored token
   useEffect(() => {
     const storedToken = localStorage.getItem('hearth_token');
@@ -123,6 +127,7 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout,
+        updateUser,
       }}
     >
       {children}
