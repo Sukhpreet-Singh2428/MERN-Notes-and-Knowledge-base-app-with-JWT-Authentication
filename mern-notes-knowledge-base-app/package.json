@@ -1,7 +1,7 @@
 {
   "name": "mern-notes-knowledge-base-app",
   "version": "1.0.0",
-  "description": "Hearth Notes — MERN Notes & Knowledge Base App (CE1 Version)",
+  "description": "Hearth Notes — MERN Notes & Knowledge Base App with JWT Authentication (CE-2 Version)",
   "private": true,
   "scripts": {
     "start": "node backend/src/server.js",
@@ -16,8 +16,11 @@
     "knowledge-base",
     "react",
     "express",
-    "ce1"
+    "mongodb",
+    "jwt",
+    "mern",
+    "ce2"
   ],
-  "author": "Elena Rostova",
+  "author": "Hearth Notes Team",
   "license": "ISC"
 }
